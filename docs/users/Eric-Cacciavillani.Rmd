@@ -1,0 +1,18 @@
+---
+title: "Eric Cacciavillani"
+image: "Eric-Cacciavillani.jpg"
+color1: "#5A59A3"
+color2: "#C66060"
+links:
+  - label: LinkedIn
+    url: "https://www.linkedin.com/in/eric-cacciavillani/"
+  - label: GitHub
+    url: "https://github.com/EricCacciavillani"
+  - label: Email
+    url: "ecacciavilla@umass.edu"
+output:
+  postcards::jolla
+---
+
+I am a data and computer scientist looking to learn more machine learning techniques to apply to my everyday work.
+I am currently employed at blue sage solutions to creat machine learning products and data analysis for mortgages and loans.

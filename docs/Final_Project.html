@@ -1,0 +1,1662 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>Visualizations of Heart Disease</title>
+
+<!--radix_placeholder_navigation_in_header-->
+<meta name="distill:offset" content=""/>
+
+<script type="application/javascript">
+
+  window.headroom_prevent_pin = false;
+
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+
+    // initialize headroom for banner
+    var header = $('header').get(0);
+    var headerHeight = header.offsetHeight;
+    var headroom = new Headroom(header, {
+      tolerance: 5,
+      onPin : function() {
+        if (window.headroom_prevent_pin) {
+          window.headroom_prevent_pin = false;
+          headroom.unpin();
+        }
+      }
+    });
+    headroom.init();
+    if(window.location.hash)
+      headroom.unpin();
+    $(header).addClass('headroom--transition');
+
+    // offset scroll location for banner on hash change
+    // (see: https://github.com/WickyNilliams/headroom.js/issues/38)
+    window.addEventListener("hashchange", function(event) {
+      window.scrollTo(0, window.pageYOffset - (headerHeight + 25));
+    });
+
+    // responsive menu
+    $('.distill-site-header').each(function(i, val) {
+      var topnav = $(this);
+      var toggle = topnav.find('.nav-toggle');
+      toggle.on('click', function() {
+        topnav.toggleClass('responsive');
+      });
+    });
+
+    // nav dropdowns
+    $('.nav-dropbtn').click(function(e) {
+      $(this).next('.nav-dropdown-content').toggleClass('nav-dropdown-active');
+      $(this).parent().siblings('.nav-dropdown')
+         .children('.nav-dropdown-content').removeClass('nav-dropdown-active');
+    });
+    $("body").click(function(e){
+      $('.nav-dropdown-content').removeClass('nav-dropdown-active');
+    });
+    $(".nav-dropdown").click(function(e){
+      e.stopPropagation();
+    });
+  });
+</script>
+
+<style type="text/css">
+
+/* Theme (user-documented overrideables for nav appearance) */
+
+.distill-site-nav {
+  color: rgba(255, 255, 255, 0.8);
+  background-color: #0F2E3D;
+  font-size: 15px;
+  font-weight: 300;
+}
+
+.distill-site-nav a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.distill-site-nav a:hover {
+  color: white;
+}
+
+@media print {
+  .distill-site-nav {
+    display: none;
+  }
+}
+
+.distill-site-header {
+
+}
+
+.distill-site-footer {
+
+}
+
+
+/* Site Header */
+
+.distill-site-header {
+  width: 100%;
+  box-sizing: border-box;
+  z-index: 3;
+}
+
+.distill-site-header .nav-left {
+  display: inline-block;
+  margin-left: 8px;
+}
+
+@media screen and (max-width: 768px) {
+  .distill-site-header .nav-left {
+    margin-left: 0;
+  }
+}
+
+
+.distill-site-header .nav-right {
+  float: right;
+  margin-right: 8px;
+}
+
+.distill-site-header a,
+.distill-site-header .title {
+  display: inline-block;
+  text-align: center;
+  padding: 14px 10px 14px 10px;
+}
+
+.distill-site-header .title {
+  font-size: 18px;
+  min-width: 150px;
+}
+
+.distill-site-header .logo {
+  padding: 0;
+}
+
+.distill-site-header .logo img {
+  display: none;
+  max-height: 20px;
+  width: auto;
+  margin-bottom: -4px;
+}
+
+.distill-site-header .nav-image img {
+  max-height: 18px;
+  width: auto;
+  display: inline-block;
+  margin-bottom: -3px;
+}
+
+
+
+@media screen and (min-width: 1000px) {
+  .distill-site-header .logo img {
+    display: inline-block;
+  }
+  .distill-site-header .nav-left {
+    margin-left: 20px;
+  }
+  .distill-site-header .nav-right {
+    margin-right: 20px;
+  }
+  .distill-site-header .title {
+    padding-left: 12px;
+  }
+}
+
+
+.distill-site-header .nav-toggle {
+  display: none;
+}
+
+.nav-dropdown {
+  display: inline-block;
+  position: relative;
+}
+
+.nav-dropdown .nav-dropbtn {
+  border: none;
+  outline: none;
+  color: rgba(255, 255, 255, 0.8);
+  padding: 16px 10px;
+  background-color: transparent;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  margin: 0;
+  margin-top: 1px;
+  z-index: 2;
+}
+
+.nav-dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: white;
+  min-width: 200px;
+  border: 1px solid rgba(0,0,0,0.15);
+  border-radius: 4px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.1);
+  z-index: 1;
+  margin-top: 2px;
+  white-space: nowrap;
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+.nav-dropdown-content hr {
+  margin-top: 4px;
+  margin-bottom: 4px;
+  border: none;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.nav-dropdown-active {
+  display: block;
+}
+
+.nav-dropdown-content a, .nav-dropdown-content .nav-dropdown-header {
+  color: black;
+  padding: 6px 24px;
+  text-decoration: none;
+  display: block;
+  text-align: left;
+}
+
+.nav-dropdown-content .nav-dropdown-header {
+  display: block;
+  padding: 5px 24px;
+  padding-bottom: 0;
+  text-transform: uppercase;
+  font-size: 14px;
+  color: #999999;
+  white-space: nowrap;
+}
+
+.nav-dropdown:hover .nav-dropbtn {
+  color: white;
+}
+
+.nav-dropdown-content a:hover {
+  background-color: #ddd;
+  color: black;
+}
+
+.nav-right .nav-dropdown-content {
+  margin-left: -45%;
+  right: 0;
+}
+
+@media screen and (max-width: 768px) {
+  .distill-site-header a, .distill-site-header .nav-dropdown  {display: none;}
+  .distill-site-header a.nav-toggle {
+    float: right;
+    display: block;
+  }
+  .distill-site-header .title {
+    margin-left: 0;
+  }
+  .distill-site-header .nav-right {
+    margin-right: 0;
+  }
+  .distill-site-header {
+    overflow: hidden;
+  }
+  .nav-right .nav-dropdown-content {
+    margin-left: 0;
+  }
+}
+
+
+@media screen and (max-width: 768px) {
+  .distill-site-header.responsive {position: relative; min-height: 500px; }
+  .distill-site-header.responsive a.nav-toggle {
+    position: absolute;
+    right: 0;
+    top: 0;
+  }
+  .distill-site-header.responsive a,
+  .distill-site-header.responsive .nav-dropdown {
+    display: block;
+    text-align: left;
+  }
+  .distill-site-header.responsive .nav-left,
+  .distill-site-header.responsive .nav-right {
+    width: 100%;
+  }
+  .distill-site-header.responsive .nav-dropdown {float: none;}
+  .distill-site-header.responsive .nav-dropdown-content {position: relative;}
+  .distill-site-header.responsive .nav-dropdown .nav-dropbtn {
+    display: block;
+    width: 100%;
+    text-align: left;
+  }
+}
+
+/* Site Footer */
+
+.distill-site-footer {
+  width: 100%;
+  overflow: hidden;
+  box-sizing: border-box;
+  z-index: 3;
+  margin-top: 30px;
+  padding-top: 30px;
+  padding-bottom: 30px;
+  text-align: center;
+}
+
+/* Headroom */
+
+d-title {
+  padding-top: 6rem;
+}
+
+@media print {
+  d-title {
+    padding-top: 4rem;
+  }
+}
+
+.headroom {
+  z-index: 1000;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+
+.headroom--transition {
+  transition: all .4s ease-in-out;
+}
+
+.headroom--unpinned {
+  top: -100px;
+}
+
+.headroom--pinned {
+  top: 0;
+}
+
+/* adjust viewport for navbar height */
+/* helps vertically center bootstrap (non-distill) content */
+.min-vh-100 {
+  min-height: calc(100vh - 100px) !important;
+}
+
+</style>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet"/>
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet"/>
+<script src="site_libs/headroom-0.9.4/headroom.min.js"></script>
+<!--/radix_placeholder_navigation_in_header-->
+<!--radix_placeholder_site_in_header-->
+<!--/radix_placeholder_site_in_header-->
+
+<style type="text/css">
+body {
+  padding-top: 60px;
+}
+</style>
+<style type="text/css">
+/* base variables */
+
+/* Edit the CSS properties in this file to create a custom
+   Distill theme. Only edit values in the right column
+   for each row; values shown are the CSS defaults.
+   To return any property to the default,
+   you may set its value to: unset
+   All rows must end with a semi-colon.                      */
+
+/* Optional: embed custom fonts here with `@import`          */
+/* This must remain at the top of this file.                 */
+
+
+
+html {
+  /*-- Main font sizes --*/
+  --title-size:      50px;
+  --body-size:       1.06rem;
+  --code-size:       14px;
+  --aside-size:      12px;
+  --fig-cap-size:    13px;
+  /*-- Main font colors --*/
+  --title-color:     #000000;
+  --header-color:    rgba(0, 0, 0, 0.8);
+  --body-color:      rgba(0, 0, 0, 0.8);
+  --aside-color:     rgba(0, 0, 0, 0.6);
+  --fig-cap-color:   rgba(0, 0, 0, 0.6);
+  /*-- Specify custom fonts ~~~ must be imported above   --*/
+  --heading-font:    sans-serif;
+  --mono-font:       monospace;
+  --body-font:       sans-serif;
+  --navbar-font:     sans-serif;  /* websites + blogs only */
+}
+
+/*-- ARTICLE METADATA --*/
+d-byline {
+  --heading-size:    0.6rem;
+  --heading-color:   rgba(0, 0, 0, 0.5);
+  --body-size:       0.8rem;
+  --body-color:      rgba(0, 0, 0, 0.8);
+}
+
+/*-- ARTICLE TABLE OF CONTENTS --*/
+.d-contents {
+  --heading-size:    18px;
+  --contents-size:   13px;
+}
+
+/*-- ARTICLE APPENDIX --*/
+d-appendix {
+  --heading-size:    15px;
+  --heading-color:   rgba(0, 0, 0, 0.65);
+  --text-size:       0.8em;
+  --text-color:      rgba(0, 0, 0, 0.5);
+}
+
+/*-- WEBSITE HEADER + FOOTER --*/
+/* These properties only apply to Distill sites and blogs  */
+
+.distill-site-header {
+  --title-size:       18px;
+  --text-color:       rgba(255, 255, 255, 0.8);
+  --text-size:        15px;
+  --hover-color:      white;
+  --bkgd-color:       #0F2E3D;
+}
+
+.distill-site-footer {
+  --text-color:       rgba(255, 255, 255, 0.8);
+  --text-size:        15px;
+  --hover-color:      white;
+  --bkgd-color:       #0F2E3D;
+}
+
+/*-- Additional custom styles --*/
+/* Add any additional CSS rules below                      */
+</style>
+<style type="text/css">
+/* base variables */
+
+/* Edit the CSS properties in this file to create a custom
+   Distill theme. Only edit values in the right column
+   for each row; values shown are the CSS defaults.
+   To return any property to the default,
+   you may set its value to: unset
+   All rows must end with a semi-colon.                      */
+
+/* Optional: embed custom fonts here with `@import`          */
+/* This must remain at the top of this file.                 */
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lora&display=swap');
+
+html {
+  /*-- Main font sizes --*/
+  --title-size:      2.5rem;
+  --body-size:       1.06rem;
+  --code-size:       14px;
+  --aside-size:      12px;
+  --fig-cap-size:    13px;
+  /*-- Main font colors --*/
+  --title-color:     #881c1c;
+  --header-color:    #63666a;
+  --body-color:      #63666a;
+  --aside-color:     rgba(0, 0, 0, 0.6);
+  --fig-cap-color:   rgba(0, 0, 0, 0.6);
+  /*-- Specify custom fonts ~~~ must be imported above   --*/
+  --title-font:      'Open Sans', sans-serif;
+  --heading-font:    'Open Sans', sans-serif;
+  --mono-font:       'Open Sans', sans-serif;
+  --body-font:       'Open Sans', sans-serif;
+  --navbar-font:     'Open Sans', sans-serif;
+}
+
+/*-- ARTICLE METADATA --*/
+d-byline {
+  --heading-size:    0.6rem;
+  --heading-color:   rgba(0, 0, 0, 0.5);
+  --body-size:       0.8rem;
+  --body-color:      rgba(0, 0, 0, 0.8);
+}
+
+/*-- ARTICLE TABLE OF CONTENTS --*/
+.d-contents {
+  --heading-size:    18px;
+  --contents-size:   13px;
+}
+
+.posts-with-sidebar .posts-list {
+      width: 80%;
+}
+
+.posts-with-sidebar .posts-sidebar {
+      width: 16%;
+}
+
+/*-- ARTICLE APPENDIX --*/
+d-appendix {
+  --heading-size:    15px;
+  --heading-color:   rgba(0, 0, 0, 0.65);
+  --text-size:       0.8em;
+  --text-color:      rgba(0, 0, 0, 0.5);
+}
+
+/*-- WEBSITE HEADER + FOOTER --*/
+/* These properties only apply to Distill sites and blogs  */
+
+.distill-site-header {
+  --title-size: 20px;
+  --text-size: 18px;
+  --hover-color:      white;
+  --bkgd-color:       #881c1c;
+}
+
+.distill-site-footer {
+  --text-color:       white;
+  --text-size:        15px;
+  --hover-color:      white;
+  --bkgd-color:       #881c1c;
+}
+
+.footer-center {
+  grid-column-start: middle-start /  text-end;
+  grid-row: 1 / 2;
+}
+
+/*-- Additional custom styles --*/
+/* Add any additional CSS rules below */
+
+/* Logo sizing */
+.logo img {
+  padding-bottom: 3px;
+  margin-bottom: 0px;
+  padding-right: 0px;
+  vertical-align: unset;
+}
+
+/* Categories / labels */
+.dt-tag {
+  color: #881c1c !important;
+}
+
+/* Navbar right links */
+.nav-right a {
+  font-size: 16px;
+}
+
+/* PDF on syllabus page */
+embed[type="application/pdf"] {
+  height: 800px;
+  width: 700px;
+}
+
+/* Index page title (coursename) */
+
+d-title h1{
+  text-align: left;
+  font-variant: small-caps;
+  margin-top: .5rem;
+  margin-bottom: .25rem;
+  font-size: 2rem;
+  color: #881c1c;
+  line-height: 1.1 !important;
+  /* font-weight: 200; */
+}
+
+.index-title h1{
+  text-align: center;
+  font-variant: small-caps;
+  margin-top: .5rem;
+  margin-bottom: .25rem;
+  font-size: 2rem;
+  color: #881c1c;
+  line-height: 1.1 !important;
+  /* font-weight: 200; */
+}
+
+/* Index page subtitle (semester) */
+d-title h2 {
+  text-align:left;
+  font-variant: small-caps;
+  margin-top: 0rem;
+  margin-bottom: 0rem;
+  padding-bottom: 0rem;
+  color: #881c1c;
+  font-weight: 200;
+  font-size: 1.5rem;
+}
+
+d-article h2 {
+  text-align:left;
+  font-variant: small-caps;
+  font-weight: 200;
+  font-size: 1.5rem;
+}
+
+.index-title h2{
+  text-align: center;
+  font-variant: small-caps;
+  margin-top: 0rem;
+  margin-bottom: 0rem;
+  padding-bottom: 0rem;
+  color: #881c1c;
+  font-weight: 200;
+  font-size: 1.5rem;
+}
+
+/* Size of user images */
+.rounded-circle {
+  height: unset;
+  width: unset;
+  border-radius: unset;
+}
+
+/* Footer social media icons */
+.social-media-icons .footer {
+  margin-right: 5px;
+}
+
+/* 
+  Remove weird formating with footer icons in posts
+  Note: not supported for Safari browsers.
+*/
+.fa-placeholder {
+  all: unset;
+}
+
+/* Align navbar button on top right side (only applies for mobile) */
+.nav-toggle {
+  padding-top: 10px !important;
+}
+
+/* remove image on mobile */
+
+.image-hide{}
+
+@media screen and (max-width: 520px) {
+    .image-hide {
+      display: none;
+    }
+    .title {
+      font-size: 14px !important;
+    }
+    .distill-site-header {
+      --title-size: 14px; 
+    }
+    .distill-site-header .title {
+      padding-left: 6px;
+      padding-right: 6px;
+    }
+    .d-title h1{
+      font-size: 22px;
+    }
+    .d-title h2{
+      font-size: 16px;
+    }
+    .index-title {
+      margin-bottom: 30px;
+    }
+    .index-title h1{
+      font-size: 22px;
+    }
+    .index-title h2{
+      font-size: 16px;
+    }
+    .d-article div {
+      margin-top:20px;
+      margin-bottom:20px;
+    }
+    .posts-list .posts-list-caption {
+      margin: 0;
+    }
+    .posts-list {
+      margin-top: 20px;
+    }
+    .posts-list .post-preview p{
+      font-size:12;
+    }
+    /* Fix padding for posts */
+    .posts-container {
+      padding-right: 0%;
+    }
+    /* DACSS footer image */
+    #dacss-footer {
+      width: 70%;
+    }
+    /* 'Student Submissions text in index */
+    .posts-list-caption {
+      font-size: 18px;
+    }
+    .nav-right a {
+      text-align: center !important;
+    }
+    /* PDF on syllabus page */
+    embed[type="application/pdf"] {
+      height: 400px;
+      width: 500px;
+    }
+  }
+
+@media screen and (max-width: 360px) {
+  .title {
+    font-size: 12px !important;
+  }
+  .distill-site-header {
+    --title-size: 12px; 
+  }
+  .distill-site-header .title {
+      padding-left: 2px;
+      padding-right: 2px;
+  }
+  .index-title {
+      margin-bottom: 30px;
+  }
+  /* Fix padding for posts */
+  .posts-container {
+      padding-right: 0%;
+  }
+  /* DACSS footer image */
+  #dacss-footer {
+      width: 70%;
+  }
+  /* 'Student Submissions text in index */
+  .posts-list-caption {
+      font-size: 18px;
+  }
+  /* PDF on syllabus page */
+  embed[type="application/pdf"] {
+    height: 400px;
+    width: 300px;
+  }
+}
+
+</style>
+<style type="text/css">
+/* base style */
+
+/* FONT FAMILIES */
+
+:root {
+  --heading-default: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", Arial, sans-serif;
+  --mono-default: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+  --body-default: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", Arial, sans-serif;
+}
+
+body,
+.posts-list .post-preview p,
+.posts-list .description p {
+  font-family: var(--body-font), var(--body-default);
+}
+
+h1, h2, h3, h4, h5, h6,
+.posts-list .post-preview h2,
+.posts-list .description h2 {
+  font-family: var(--heading-font), var(--heading-default);
+}
+
+d-article div.sourceCode code,
+d-article pre code {
+  font-family: var(--mono-font), var(--mono-default);
+}
+
+
+/*-- TITLE --*/
+d-title h1,
+.posts-list > h1 {
+  color: var(--title-color, black);
+}
+
+d-title h1 {
+  font-size: var(--title-size, 50px);
+}
+
+/*-- HEADERS --*/
+d-article h1,
+d-article h2,
+d-article h3,
+d-article h4,
+d-article h5,
+d-article h6 {
+  color: var(--header-color, rgba(0, 0, 0, 0.8));
+}
+
+/*-- BODY --*/
+d-article > p,  /* only text inside of <p> tags */
+d-article > ul, /* lists */
+d-article > ol {
+  color: var(--body-color, rgba(0, 0, 0, 0.8));
+  font-size: var(--body-size, 1.06rem);
+}
+
+
+/*-- CODE --*/
+d-article div.sourceCode code,
+d-article pre code {
+  font-size: var(--code-size, 14px);
+}
+
+/*-- ASIDE --*/
+d-article aside {
+  font-size: var(--aside-size, 12px);
+  color: var(--aside-color, rgba(0, 0, 0, 0.6));
+}
+
+/*-- FIGURE CAPTIONS --*/
+figure .caption,
+figure figcaption,
+.figure .caption {
+  font-size: var(--fig-cap-size, 13px);
+  color: var(--fig-cap-color, rgba(0, 0, 0, 0.6));
+}
+
+/*-- METADATA --*/
+d-byline h3 {
+  font-size: var(--heading-size, 0.6rem);
+  color: var(--heading-color, rgba(0, 0, 0, 0.5));
+}
+
+d-byline {
+  font-size: var(--body-size, 0.8rem);
+  color: var(--body-color, rgba(0, 0, 0, 0.8));
+}
+
+d-byline a,
+d-article d-byline a {
+  color: var(--body-color, rgba(0, 0, 0, 0.8));
+}
+
+/*-- TABLE OF CONTENTS --*/
+.d-contents nav h3 {
+  font-size: var(--heading-size, 18px);
+}
+
+.d-contents nav a {
+  font-size: var(--contents-size, 13px);
+}
+
+/*-- APPENDIX --*/
+d-appendix h3 {
+  font-size: var(--heading-size, 15px);
+  color: var(--heading-color, rgba(0, 0, 0, 0.65));
+}
+
+d-appendix {
+  font-size: var(--text-size, 0.8em);
+  color: var(--text-color, rgba(0, 0, 0, 0.5));
+}
+
+d-appendix d-footnote-list a.footnote-backlink {
+  color: var(--text-color, rgba(0, 0, 0, 0.5));
+}
+
+/*-- WEBSITE HEADER + FOOTER --*/
+.distill-site-header .title {
+  font-size: var(--title-size, 18px);
+  font-family: var(--navbar-font), var(--heading-default);
+}
+
+.distill-site-header a,
+.nav-dropdown .nav-dropbtn {
+  font-family: var(--navbar-font), var(--heading-default);
+}
+
+.nav-dropdown .nav-dropbtn {
+  color: var(--text-color, rgba(255, 255, 255, 0.8));
+  font-size: var(--text-size, 15px);
+}
+
+.distill-site-header a:hover,
+.nav-dropdown:hover .nav-dropbtn {
+  color: var(--hover-color, white);
+}
+
+.distill-site-header {
+  font-size: var(--text-size, 15px);
+  color: var(--text-color, rgba(255, 255, 255, 0.8));
+  background-color: var(--bkgd-color, #0F2E3D);
+}
+
+.distill-site-footer {
+  font-size: var(--text-size, 15px);
+  color: var(--text-color, rgba(255, 255, 255, 0.8));
+  background-color: var(--bkgd-color, #0F2E3D);
+}
+
+.distill-site-footer a:hover {
+  color: var(--hover-color, white);
+}</style>
+<script src="/Library/Frameworks/R.framework/Versions/4.1/Resources/library/rmarkdown/rmd/h/pandoc/header-attrs.js"></script>
+<script src="/Library/Frameworks/R.framework/Versions/4.1/Resources/library/rmarkdown/rmd/h/jquery/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="/Library/Frameworks/R.framework/Versions/4.1/Resources/library/rmarkdown/rmd/h/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+<script src="/Library/Frameworks/R.framework/Versions/4.1/Resources/library/rmarkdown/rmd/h/bootstrap/js/bootstrap.min.js"></script>
+<script src="/Library/Frameworks/R.framework/Versions/4.1/Resources/library/rmarkdown/rmd/h/bootstrap/shim/html5shiv.min.js"></script>
+<script src="/Library/Frameworks/R.framework/Versions/4.1/Resources/library/rmarkdown/rmd/h/bootstrap/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="/Library/Frameworks/R.framework/Versions/4.1/Resources/library/rmarkdown/rmd/h/navigation-1.1/tabsets.js"></script>
+<link href="/Library/Frameworks/R.framework/Versions/4.1/Resources/library/rmarkdown/rmd/h/highlightjs/default.css" rel="stylesheet" />
+<script src="/Library/Frameworks/R.framework/Versions/4.1/Resources/library/rmarkdown/rmd/h/highlightjs/highlight.js"></script>
+<link href="/Library/Frameworks/R.framework/Versions/4.1/Resources/library/rmarkdown/rmd/h/pagedtable-1.1/css/pagedtable.css" rel="stylesheet" />
+<script src="/Library/Frameworks/R.framework/Versions/4.1/Resources/library/rmarkdown/rmd/h/pagedtable-1.1/js/pagedtable.js"></script>
+<link href="/Library/Frameworks/R.framework/Versions/4.1/Resources/library/rmarkdown/rmd/h/fontawesome/css/all.css" rel="stylesheet" />
+<link href="/Library/Frameworks/R.framework/Versions/4.1/Resources/library/rmarkdown/rmd/h/fontawesome/css/v4-shims.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.tab('show');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+<!--radix_placeholder_navigation_before_body-->
+<header class="header header--fixed" role="banner">
+<nav class="distill-site-nav distill-site-header">
+<div class="nav-left">
+<a class="logo" href="https://www.umass.edu">
+<img src="images/UMass White Workmark Horiz.png" alt="Logo"/>
+</a>
+<a href="index.html" class="title">Data Analytics and Computational Social Science</a>
+</div>
+<div class="nav-right">
+<a href="about.html">About</a>
+<a href="syllabus.html">Syllabus</a>
+<a href="students.html">Students</a>
+<a href="Sample_data_info.html">Example Data</a>
+<a href="https://github.com/mrolfe/DACSS601August2021.git">
+<i class="fab fa-github-alt fa-1x" aria-hidden="true"></i>
+</a>
+<a href="javascript:void(0);" class="nav-toggle">&#9776;</a>
+</div>
+</nav>
+</header>
+<!--/radix_placeholder_navigation_before_body-->
+<!--radix_placeholder_site_before_body-->
+<!--/radix_placeholder_site_before_body-->
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html"></a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="syllabus.html">Syllabus</a>
+</li>
+<li>
+  <a href="students.html">Students</a>
+</li>
+<li>
+  <a href="Sample_data_info.html">Example Data</a>
+</li>
+<li>
+  <a href="https://github.com/mrolfe/DACSS601August2021.git">
+    <span class="fab fa-github-alt fa-1x"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Visualizations of Heart Disease</h1>
+
+</div>
+
+
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>In this research project I want to understand what attributes of both the human body and attributes of the heart relate to heart diseases. My interest derives from the fact that I am currently under diagnosis for my own heart related disease and would like to become more versed in understanding what attributes that I myself should look into and moreover gain a better understanding of the terminology in the cardiology field. This will hopefully empower me to be more able to understand the terminology when discussing treatment options with my doctor as my diagnosis continues. I feel this understanding will help put myself more at ease as I go through this tough time and help me not feel overwhelmed by the overall jargon the doctors will be using when discussing any problems I may or may not have. I am particularly going to look at the UCI Heart disease dataset because it correlates directly to real life patient data and is well structured data. In an attempt to see what attributes I should look at when trying to predict heart disease. I want to find out if heart disease is more related to attributes of the body such as age and gender or more so to attributes of the organ itself. As well as understand which features are more related to each other under the guise of heart disease. I am interested in mainly seeing how age, gender, blood pressure, resting electrocardiographic measurement seem to have a impact the overall chances of having a heart disease.</p>
+</div>
+<div id="background-dataset-info" class="section level2">
+<h2>Background Dataset info</h2>
+<p>The original dataset is from the UCI which is a repository for datasets for developing and working with machine learning algorithms. However, the original distributors of the datasets were University Hospital, Zurich, Switzerland: William Steinbrunn, M.D, University Hospital, Basel, Switzerland: Matthias Pfisterer, M.D, V.A.Medical Center, Long Beach and Cleveland Clinic Foundation: Robert Detrano,M.D., Ph.D. These are the following features of my dataset.</p>
+<div id="features-of-the-data-set" class="section level3">
+<h3>Features of the data set</h3>
+<ul>
+<li>age: The person’s age in years</li>
+<li>sex: The person’s sex (1 = male, 0 = female)</li>
+<li>cp: The chest pain experienced (Value 1: typical angina, Value 2: atypical angina, Value 3: non-anginal pain, Value 4: asymptomatic)</li>
+<li>trestbps: The person’s resting blood pressure (mm Hg on admission to the hospital)</li>
+<li>chol: The person’s cholesterol measurement in mg/dl</li>
+<li>fbs: The person’s fasting blood sugar (if &gt; 120 mg/dl, 1 = true; 0 = false)</li>
+<li>restecg: Resting electrocardiographic measurement (0 = normal, 1 = having ST-T wave abnormality, 2 = showing * probable or definite left ventricular hypertrophy by Estes’ criteria)</li>
+<li>thalach: The person’s maximum heart rate achieved</li>
+<li>exang: Exercise induced angina (1 = yes; 0 = no)</li>
+<li>oldpeak: ST depression induced by exercise relative to rest (‘ST’ relates to positions on the ECG plot)</li>
+<li>slope: the slope of the peak exercise ST segment (Value 1: upsloping, Value 2: flat, Value 3: downsloping)</li>
+<li>ca: The number of major vessels (0-3)</li>
+<li>thal: A blood disorder called thalassemia (1 = normal; 2 = fixed defect; 3 = reversable defect)</li>
+<li>target: Heart disease (0 = no, 1 = yes)</li>
+</ul>
+</div>
+</div>
+<div id="set-working-directory-for-file-managment" class="section level2">
+<h2>Set working directory for file managment</h2>
+<pre class="r"><code>setwd(&quot;~/Desktop/Coding/R_Programming/Heart_Data&quot;)</code></pre>
+<p>You should change this line of code to match your own path to the given directory</p>
+</div>
+<div id="install-any-needed-packagess" class="section level2">
+<h2>Install any needed packagess</h2>
+<pre class="r"><code>install.packages(&quot;dplyr&quot;,repos = &quot;http://cran.us.r-project.org&quot;)</code></pre>
+<pre><code>## 
+## The downloaded binary packages are in
+##  /var/folders/m2/4xqw25n97sxf7vsnk1lk9x900000gn/T//RtmpOsitpm/downloaded_packages</code></pre>
+<pre class="r"><code>install.packages(&quot;tidyverse&quot;,repos = &quot;http://cran.us.r-project.org&quot;)</code></pre>
+<pre><code>## 
+## The downloaded binary packages are in
+##  /var/folders/m2/4xqw25n97sxf7vsnk1lk9x900000gn/T//RtmpOsitpm/downloaded_packages</code></pre>
+<pre class="r"><code>install.packages(&quot;corrplot&quot;,repos = &quot;http://cran.us.r-project.org&quot;)</code></pre>
+<pre><code>## 
+## The downloaded binary packages are in
+##  /var/folders/m2/4xqw25n97sxf7vsnk1lk9x900000gn/T//RtmpOsitpm/downloaded_packages</code></pre>
+<pre class="r"><code>install.packages(&quot;ggcorrplot&quot;,repos = &quot;http://cran.us.r-project.org&quot;)</code></pre>
+<pre><code>## 
+## The downloaded binary packages are in
+##  /var/folders/m2/4xqw25n97sxf7vsnk1lk9x900000gn/T//RtmpOsitpm/downloaded_packages</code></pre>
+<pre class="r"><code>install.packages(&quot;ggplot2&quot;,repos = &quot;http://cran.us.r-project.org&quot;)</code></pre>
+<pre><code>## 
+## The downloaded binary packages are in
+##  /var/folders/m2/4xqw25n97sxf7vsnk1lk9x900000gn/T//RtmpOsitpm/downloaded_packages</code></pre>
+<pre class="r"><code>install.packages(&quot;plyr&quot;,repos = &quot;http://cran.us.r-project.org&quot;)</code></pre>
+<pre><code>## 
+## The downloaded binary packages are in
+##  /var/folders/m2/4xqw25n97sxf7vsnk1lk9x900000gn/T//RtmpOsitpm/downloaded_packages</code></pre>
+<pre class="r"><code>install.packages(&quot;caTools&quot;,repos = &quot;http://cran.us.r-project.org&quot;)</code></pre>
+<pre><code>## 
+## The downloaded binary packages are in
+##  /var/folders/m2/4xqw25n97sxf7vsnk1lk9x900000gn/T//RtmpOsitpm/downloaded_packages</code></pre>
+<pre class="r"><code>install.packages(&quot;RColorBrewer&quot;,repos = &quot;http://cran.us.r-project.org&quot;)</code></pre>
+<pre><code>## 
+## The downloaded binary packages are in
+##  /var/folders/m2/4xqw25n97sxf7vsnk1lk9x900000gn/T//RtmpOsitpm/downloaded_packages</code></pre>
+<pre class="r"><code>install.packages(&quot;rpart&quot;,repos = &quot;http://cran.us.r-project.org&quot;)</code></pre>
+<pre><code>## 
+## The downloaded binary packages are in
+##  /var/folders/m2/4xqw25n97sxf7vsnk1lk9x900000gn/T//RtmpOsitpm/downloaded_packages</code></pre>
+<pre class="r"><code>install.packages(&quot;rpart.plot&quot;,repos = &quot;http://cran.us.r-project.org&quot;)</code></pre>
+<pre><code>## 
+## The downloaded binary packages are in
+##  /var/folders/m2/4xqw25n97sxf7vsnk1lk9x900000gn/T//RtmpOsitpm/downloaded_packages</code></pre>
+<pre class="r"><code>install.packages(&quot;naniar&quot;,repos = &quot;http://cran.us.r-project.org&quot;)</code></pre>
+<pre><code>## 
+## The downloaded binary packages are in
+##  /var/folders/m2/4xqw25n97sxf7vsnk1lk9x900000gn/T//RtmpOsitpm/downloaded_packages</code></pre>
+<pre class="r"><code>library(plyr)
+library(tidyverse)</code></pre>
+<pre><code>## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──</code></pre>
+<pre><code>## ✓ ggplot2 3.3.5     ✓ purrr   0.3.4
+## ✓ tibble  3.1.3     ✓ dplyr   1.0.7
+## ✓ tidyr   1.1.3     ✓ stringr 1.4.0
+## ✓ readr   2.0.1     ✓ forcats 0.5.1</code></pre>
+<pre><code>## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+## x dplyr::arrange()   masks plyr::arrange()
+## x purrr::compact()   masks plyr::compact()
+## x dplyr::count()     masks plyr::count()
+## x dplyr::failwith()  masks plyr::failwith()
+## x dplyr::filter()    masks stats::filter()
+## x dplyr::id()        masks plyr::id()
+## x dplyr::lag()       masks stats::lag()
+## x dplyr::mutate()    masks plyr::mutate()
+## x dplyr::rename()    masks plyr::rename()
+## x dplyr::summarise() masks plyr::summarise()
+## x dplyr::summarize() masks plyr::summarize()</code></pre>
+<pre class="r"><code>library(dplyr)
+library(corrplot)</code></pre>
+<pre><code>## corrplot 0.90 loaded</code></pre>
+<pre class="r"><code>library(corrplot)
+library(ggcorrplot)
+library(ggplot2)
+library(RColorBrewer)
+library(rpart)
+library(rpart.plot)
+library(naniar)</code></pre>
+</div>
+<div id="import-csv-file-of-dataset" class="section level2">
+<h2>Import csv file of dataset</h2>
+<pre class="r"><code>heart_df &lt;- read.csv(&quot;Datasets/heart.csv&quot;)</code></pre>
+</div>
+<div id="quick-look-at-the-dimensions" class="section level2">
+<h2>Quick look at the dimensions</h2>
+<pre class="r"><code>head(heart_df)</code></pre>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["age"],"name":[1],"type":["int"],"align":["right"]},{"label":["sex"],"name":[2],"type":["int"],"align":["right"]},{"label":["cp"],"name":[3],"type":["int"],"align":["right"]},{"label":["trestbps"],"name":[4],"type":["int"],"align":["right"]},{"label":["chol"],"name":[5],"type":["int"],"align":["right"]},{"label":["fbs"],"name":[6],"type":["int"],"align":["right"]},{"label":["restecg"],"name":[7],"type":["int"],"align":["right"]},{"label":["thalach"],"name":[8],"type":["int"],"align":["right"]},{"label":["exang"],"name":[9],"type":["int"],"align":["right"]},{"label":["oldpeak"],"name":[10],"type":["dbl"],"align":["right"]},{"label":["slope"],"name":[11],"type":["int"],"align":["right"]},{"label":["ca"],"name":[12],"type":["int"],"align":["right"]},{"label":["thal"],"name":[13],"type":["int"],"align":["right"]},{"label":["target"],"name":[14],"type":["int"],"align":["right"]}],"data":[{"1":"63","2":"1","3":"3","4":"145","5":"233","6":"1","7":"0","8":"150","9":"0","10":"2.3","11":"0","12":"0","13":"1","14":"1","_rn_":"1"},{"1":"37","2":"1","3":"2","4":"130","5":"250","6":"0","7":"1","8":"187","9":"0","10":"3.5","11":"0","12":"0","13":"2","14":"1","_rn_":"2"},{"1":"41","2":"0","3":"1","4":"130","5":"204","6":"0","7":"0","8":"172","9":"0","10":"1.4","11":"2","12":"0","13":"2","14":"1","_rn_":"3"},{"1":"56","2":"1","3":"1","4":"120","5":"236","6":"0","7":"1","8":"178","9":"0","10":"0.8","11":"2","12":"0","13":"2","14":"1","_rn_":"4"},{"1":"57","2":"0","3":"0","4":"120","5":"354","6":"0","7":"1","8":"163","9":"1","10":"0.6","11":"2","12":"0","13":"2","14":"1","_rn_":"5"},{"1":"57","2":"1","3":"0","4":"140","5":"192","6":"0","7":"1","8":"148","9":"0","10":"0.4","11":"1","12":"0","13":"1","14":"1","_rn_":"6"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+<pre class="r"><code>nrow(heart_df)</code></pre>
+<pre><code>## [1] 303</code></pre>
+<pre class="r"><code>ncol(heart_df)</code></pre>
+<pre><code>## [1] 14</code></pre>
+</div>
+<div id="summary-of-heart-dataset" class="section level2">
+<h2>Summary of heart dataset</h2>
+<pre class="r"><code>str(heart_df)</code></pre>
+<pre><code>## &#39;data.frame&#39;:    303 obs. of  14 variables:
+##  $ age     : int  63 37 41 56 57 57 56 44 52 57 ...
+##  $ sex     : int  1 1 0 1 0 1 0 1 1 1 ...
+##  $ cp      : int  3 2 1 1 0 0 1 1 2 2 ...
+##  $ trestbps: int  145 130 130 120 120 140 140 120 172 150 ...
+##  $ chol    : int  233 250 204 236 354 192 294 263 199 168 ...
+##  $ fbs     : int  1 0 0 0 0 0 0 0 1 0 ...
+##  $ restecg : int  0 1 0 1 1 1 0 1 1 1 ...
+##  $ thalach : int  150 187 172 178 163 148 153 173 162 174 ...
+##  $ exang   : int  0 0 0 0 1 0 0 0 0 0 ...
+##  $ oldpeak : num  2.3 3.5 1.4 0.8 0.6 0.4 1.3 0 0.5 1.6 ...
+##  $ slope   : int  0 0 2 2 2 1 1 2 2 2 ...
+##  $ ca      : int  0 0 0 0 0 0 0 0 0 0 ...
+##  $ thal    : int  1 2 2 2 2 1 2 3 3 2 ...
+##  $ target  : int  1 1 1 1 1 1 1 1 1 1 ...</code></pre>
+<pre class="r"><code>summary(heart_df)</code></pre>
+<pre><code>##       age             sex               cp           trestbps    
+##  Min.   :29.00   Min.   :0.0000   Min.   :0.000   Min.   : 94.0  
+##  1st Qu.:47.50   1st Qu.:0.0000   1st Qu.:0.000   1st Qu.:120.0  
+##  Median :55.00   Median :1.0000   Median :1.000   Median :130.0  
+##  Mean   :54.37   Mean   :0.6832   Mean   :0.967   Mean   :131.6  
+##  3rd Qu.:61.00   3rd Qu.:1.0000   3rd Qu.:2.000   3rd Qu.:140.0  
+##  Max.   :77.00   Max.   :1.0000   Max.   :3.000   Max.   :200.0  
+##       chol            fbs            restecg          thalach     
+##  Min.   :126.0   Min.   :0.0000   Min.   :0.0000   Min.   : 71.0  
+##  1st Qu.:211.0   1st Qu.:0.0000   1st Qu.:0.0000   1st Qu.:133.5  
+##  Median :240.0   Median :0.0000   Median :1.0000   Median :153.0  
+##  Mean   :246.3   Mean   :0.1485   Mean   :0.5281   Mean   :149.6  
+##  3rd Qu.:274.5   3rd Qu.:0.0000   3rd Qu.:1.0000   3rd Qu.:166.0  
+##  Max.   :564.0   Max.   :1.0000   Max.   :2.0000   Max.   :202.0  
+##      exang           oldpeak         slope             ca        
+##  Min.   :0.0000   Min.   :0.00   Min.   :0.000   Min.   :0.0000  
+##  1st Qu.:0.0000   1st Qu.:0.00   1st Qu.:1.000   1st Qu.:0.0000  
+##  Median :0.0000   Median :0.80   Median :1.000   Median :0.0000  
+##  Mean   :0.3267   Mean   :1.04   Mean   :1.399   Mean   :0.7294  
+##  3rd Qu.:1.0000   3rd Qu.:1.60   3rd Qu.:2.000   3rd Qu.:1.0000  
+##  Max.   :1.0000   Max.   :6.20   Max.   :2.000   Max.   :4.0000  
+##       thal           target      
+##  Min.   :0.000   Min.   :0.0000  
+##  1st Qu.:2.000   1st Qu.:0.0000  
+##  Median :2.000   Median :1.0000  
+##  Mean   :2.314   Mean   :0.5446  
+##  3rd Qu.:3.000   3rd Qu.:1.0000  
+##  Max.   :3.000   Max.   :1.0000</code></pre>
+</div>
+<div id="display-any-missing-data" class="section level2">
+<h2>Display any missing data</h2>
+<pre class="r"><code>vis_miss(heart_df)</code></pre>
+<p><img src="Final_Project_files/figure-html/missing_data_graph-1.png" width="672" /></p>
+<p>There is no missing data for this dataset so no cleaning will be needed. (Thank the data gods!)</p>
+</div>
+<div id="stat-testing-age-between-those-with-or-without-heart-disease" class="section level2">
+<h2>Stat testing age between those with or without heart disease</h2>
+<pre class="r"><code>t.test(heart_df$age ~ heart_df$target, mu = 0, alt = &quot;two.sided&quot;, conf = 0.95, var.eq = FALSE, paired = FALSE)</code></pre>
+<pre><code>## 
+##  Welch Two Sample t-test
+## 
+## data:  heart_df$age by heart_df$target
+## t = 4.0797, df = 301, p-value = 5.781e-05
+## alternative hypothesis: true difference in means between group 0 and group 1 is not equal to 0
+## 95 percent confidence interval:
+##  2.124635 6.084324
+## sample estimates:
+## mean in group 0 mean in group 1 
+##        56.60145        52.49697</code></pre>
+<p>The null hypothesis is: there is no difference in average age between those with or without heart disease.</p>
+<p>The p-value is near zero, thus we can reject our null hypothesis and with 95% confidence say there is a statistically significant difference between the average age of those who have heart disease vs those who do not.</p>
+<p>The confidence interval also does not include zero, therefore, it supports our rejection of the null.</p>
+</div>
+<div id="stat-testing-cholesterol-between-those-with-or-without-heart-disease" class="section level2">
+<h2>Stat testing cholesterol between those with or without heart disease</h2>
+<pre class="r"><code>t.test(heart_df$chol ~ heart_df$target, mu = 0, alt = &quot;two.sided&quot;, conf = 0.95, var.eq = FALSE, paired = FALSE)</code></pre>
+<pre><code>## 
+##  Welch Two Sample t-test
+## 
+## data:  heart_df$chol by heart_df$target
+## t = 1.4948, df = 298.03, p-value = 0.136
+## alternative hypothesis: true difference in means between group 0 and group 1 is not equal to 0
+## 95 percent confidence interval:
+##  -2.803241 20.516548
+## sample estimates:
+## mean in group 0 mean in group 1 
+##        251.0870        242.2303</code></pre>
+<p>Our null hypothesis states: There is no difference between the average cholesterol levels of a patient with heart disease and of a patient without heart disease.</p>
+<p>Our p-value shows that the probability of getting our results/extremes, assuming the null hypothesis is true, will happen 13.6% of the time. Therefore, we cannot reject our null hypothesis.</p>
+<p>Also since the 95% confidence interval includes zero, it supports our failure to reject the null hypothesis.</p>
+</div>
+<div id="stat-testing-blood-pressure-between-those-with-or-without-heart-disease" class="section level2">
+<h2>Stat testing blood pressure between those with or without heart disease</h2>
+<pre class="r"><code>t.test(heart_df$trestbps ~ heart_df$target, mu = 0, alt = &quot;two.sided&quot;, conf = 0.95, var.eq = FALSE, paired = FALSE)</code></pre>
+<pre><code>## 
+##  Welch Two Sample t-test
+## 
+## data:  heart_df$trestbps by heart_df$target
+## t = 2.5083, df = 272.56, p-value = 0.01271
+## alternative hypothesis: true difference in means between group 0 and group 1 is not equal to 0
+## 95 percent confidence interval:
+##  1.096240 9.094801
+## sample estimates:
+## mean in group 0 mean in group 1 
+##        134.3986        129.3030</code></pre>
+<p>The null hypothesis is: there is no difference in average blood pressure between those with or without heart disease.</p>
+<p>The p-value is 1.3% which is less than 5%, therefore we can reject our null hypothesis and with 95% confidence say there is a statistically significant difference between the average blood pressure of those who have heart disease vs those who do not.</p>
+<p>The confidence interval also does not include zero, therefore, it supports our rejection of the null.s</p>
+</div>
+<div id="displaying-the-coralation-matrix" class="section level2">
+<h2>Displaying the coralation matrix</h2>
+<pre class="r"><code>corr &lt;- cor(heart_df)</code></pre>
+<p>#s# Visualize the correlation matrix</p>
+<pre class="r"><code>corrplot(corr)</code></pre>
+<p><img src="Final_Project_files/figure-html/corr_df_plot-1.png" width="672" /></p>
+<p>It is a good rule of thumb to always look at the correlation of each of your features with one another. The correlation map helps when measuring the extent of relationship between multiple variables in one given figure. This helps when trying to decide which features to remove when trying when going about feature reduction for better statistical analysis and modeling. To do this I simply generate a correlation plot map. We can see from the given correlation plot the our dependent variable is least related with fbs, chol, trestbps, restecg because they are between -0.2, and 0.2.</p>
+</div>
+<div id="deleting-not-related-features" class="section level2">
+<h2>Deleting not related features</h2>
+<pre class="r"><code>heart_df = subset(heart_df, select = c(-fbs,-chol,-restecg))</code></pre>
+</div>
+<div id="bar-plot-for-target-heart-disease" class="section level2">
+<h2>Bar plot for target (Heart disease)</h2>
+<pre class="r"><code>target &lt;- as.factor(heart_df$target)
+ggplot(heart_df, aes(x=heart_df$target, fill=heart_df$target)) + 
+  geom_bar() +
+  xlab(&quot;Heart Disease&quot;) +
+  ylab(&quot;Count&quot;) +
+  ggtitle(&quot;Presence and Absence of Heart Disease&quot;) +
+  scale_fill_discrete(name = &quot;Heart Disease&quot;, labels = c(&quot;Absence&quot;, &quot;Presence&quot;),)</code></pre>
+<pre><code>## Warning: Use of `heart_df$target` is discouraged. Use `target` instead.
+
+## Warning: Use of `heart_df$target` is discouraged. Use `target` instead.</code></pre>
+<p><img src="Final_Project_files/figure-html/bar_plot_target-1.png" width="672" /> <img src="Plots/Heart%20Disease%20Target%20Analysis.png" alt="alt text here" /></p>
+</div>
+<div id="analysis-of-gender" class="section level2">
+<h2>Analysis of gender</h2>
+<pre class="r"><code>ggplot(heart_df, aes(x= heart_df$sex, fill=heart_df$target)) + 
+  geom_bar() +
+  xlab(&quot;Gender&quot;) +
+  ylab(&quot;Gender Count&quot;) +
+  ggtitle(&quot;Analysis of Gender&quot;) +
+  scale_fill_discrete(name = &quot;Heart disease&quot;, labels = c(&quot;No&quot;, &quot;Yes&quot;))</code></pre>
+<pre><code>## Warning: Use of `heart_df$sex` is discouraged. Use `sex` instead.</code></pre>
+<pre><code>## Warning: Use of `heart_df$target` is discouraged. Use `target` instead.</code></pre>
+<p><img src="Final_Project_files/figure-html/plot_gender-1.png" width="672" /></p>
+<p>When thinking about gender I would expect more males to have greater heart disease due to the fact they are generally physically bigger individuals and therefore their heart strain must be greater and thus increasing the chances of disease. But upon looking at the data for gender when compared against heart disease, we see that our dataset has more females then males, nearly a 1 to 2 ratio, making our data imbalanced for this feature and as a result we can not use this is untrustworthy for decision making when related to heart disease.</p>
+<div class="figure">
+<img src="Plots/Heart%20Disease%20by%20gender.png" alt="" />
+<p class="caption">alt text here</p>
+</div>
+</div>
+<div id="remove-gender" class="section level2">
+<h2>Remove gender</h2>
+<pre class="r"><code>heart_df = subset(heart_df, select = c(-sex))</code></pre>
+</div>
+<div id="bar-plot-for-the-chest-pain-experienced" class="section level2">
+<h2>Bar plot for the chest pain experienced</h2>
+<pre class="r"><code>ggplot(heart_df, aes(x= cp, fill=cp)) + 
+  geom_bar() +
+  xlab(&quot;Chest Pain Type&quot;) +
+  ylab(&quot;Count&quot;) +
+  ggtitle(&quot;Analysis of Chest Pain Experienced&quot;) +
+  scale_fill_discrete(name = &quot;Chest Pain Type&quot;, labels = c(&quot;Typical angina pain&quot;, &quot;Atypical angina pain&quot;, &quot;Non-Anginal pain&quot;, &quot;Asymptomatic pain&quot;))</code></pre>
+<p><img src="Final_Project_files/figure-html/plot_chest_pain-1.png" width="672" /></p>
+</div>
+<div id="density-plot-for-oldpeak-target" class="section level2">
+<h2>Density plot for oldpeak ~ target</h2>
+<pre class="r"><code>ggplot(heart_df, aes(x = oldpeak, fill = target)) +
+  geom_density(alpha=0.5) +
+  xlab(&quot;ST depression induced&quot;) +
+  ylab(&quot;Count&quot;) +
+  ggtitle(&quot;Analysis of ST depression induced and presence of heart disease&quot;) +
+  scale_fill_discrete(name = &quot;Heart disease&quot;, labels = c(&quot;No&quot;, &quot;Yes&quot;))</code></pre>
+<p><img src="Final_Project_files/figure-html/plot_oldpeak_by_target-1.png" width="672" /></p>
+<p>From the above graph, we can see that as the value of the old peak increases the chances of heart disease decreases. Thus highlighting the importance of this given feature when creating a statistical model or running any basic statistical data. I am surprised to see how this feature seems to impact the target feature heart disease.</p>
+<div class="figure">
+<img src="Plots/Analysis%20of%20ST%20depression%20induced%20and%20presence%20of%20heart%20disease.png" alt="" />
+<p class="caption">alt text here</p>
+</div>
+</div>
+<div id="density-graph-for-trestbps-resting-blood-pressure" class="section level2">
+<h2>Density graph for trestbps (resting blood pressure)</h2>
+<pre class="r"><code>ggplot(heart_df, aes(x = trestbps, fill = target)) +
+  geom_density(alpha=0.5) +
+  scale_fill_discrete(name = &quot;Heart disease&quot;, labels = c(&quot;No&quot;, &quot;Yes&quot;))</code></pre>
+<p><img src="Final_Project_files/figure-html/trestbps_density_graph-1.png" width="672" /> There is very little difference between the comparison of the feature trestbps and our target heart disease. So, we can remove this feature before model implementation.</p>
+<pre class="r"><code>heart_df = subset(heart_df, select = c(-trestbps))</code></pre>
+<div class="figure">
+<img src="Plots/trestbps%20by%20target.png" alt="" />
+<p class="caption">alt text here</p>
+</div>
+</div>
+<div id="plot-for-slope-target" class="section level2">
+<h2>Plot for slope ~ target</h2>
+<pre class="r"><code>ggplot(heart_df, aes(x= slope, fill=target)) + 
+  geom_bar(position = &#39;dodge&#39;) +
+  xlab(&quot;slope of the peak exercise ST segment&quot;) +
+  ylab(&quot;count&quot;) +
+  ggtitle(&quot;Analysis of slope of the peak exercise ST segment with presence or absense of heart disease&quot;) +
+  scale_fill_discrete(name = &quot;Heart disease&quot;, labels = c(&quot;No&quot;, &quot;Yes&quot;))</code></pre>
+<p><img src="Final_Project_files/figure-html/st_seg_plot-1.png" width="672" /></p>
+</div>
+<div id="group-the-different-ages-in-three-groups-young-middle-old" class="section level2">
+<h2>Group the different ages in three groups (young, middle, old)</h2>
+<pre class="r"><code># Group the different ages in three groups (young, middle, old)
+young &lt;- heart_df[which((heart_df$age&lt;45)), ]
+middle &lt;- heart_df[which((heart_df$age&gt;=45)&amp;(heart_df$age&lt;55)), ]
+elderly &lt;- heart_df[which(heart_df$age&gt;55), ]
+groups &lt;- data.frame(age_group = c(&quot;young&quot;,&quot;middle&quot;,&quot;elderly&quot;), group_count = c(NROW(young$age), NROW(middle$age), NROW(elderly$age)))</code></pre>
+</div>
+<div id="ploting-different-age-groups" class="section level2">
+<h2>Ploting different age groups</h2>
+<pre class="r"><code>ggplot(groups, aes(x=groups$age_group, y=groups$group_count, fill=groups$age_group)) + 
+  ggtitle(&quot;Age Analysis&quot;) +
+  xlab(&quot;Age Group&quot;)  +
+  ylab(&quot;group Count&quot;) +
+  geom_bar(stat=&quot;identity&quot;) +
+  scale_fill_discrete(name = &quot;Age Group&quot;, labels = c(&quot;Elderfly&quot;, &quot;Middle&quot;, &quot;Young&quot;))</code></pre>
+<pre><code>## Warning: Use of `groups$age_group` is discouraged. Use `age_group` instead.</code></pre>
+<pre><code>## Warning: Use of `groups$group_count` is discouraged. Use `group_count` instead.</code></pre>
+<pre><code>## Warning: Use of `groups$age_group` is discouraged. Use `age_group` instead.</code></pre>
+<p><img src="Final_Project_files/figure-html/plot_age_groups-1.png" width="672" /> I converted feature age of continuous data into categorical data of young, middle-aged, and elderly. Doing so also gave it a more clean look and simplified look of the given age data. There seems to be more elderly patients than both middle aged and young grouping. This gives us a general look at what kind of patients we are looking at in terms of age.</p>
+</div>
+<div id="adding-the-age-groups-to-the-dataset" class="section level1">
+<h1>Adding the age groups to the dataset</h1>
+<pre class="r"><code>heart_df &lt;- cbind(heart_df, age_groups = ifelse((heart_df$age&lt;45), 0, ifelse((heart_df$age&gt;=45)&amp;(heart_df$age&lt;55), 1, 2)))
+heart_df$age_groups &lt;- as.factor(heart_df$age_groups)</code></pre>
+<pre class="r"><code>heart_df</code></pre>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["age"],"name":[1],"type":["int"],"align":["right"]},{"label":["cp"],"name":[2],"type":["int"],"align":["right"]},{"label":["thalach"],"name":[3],"type":["int"],"align":["right"]},{"label":["exang"],"name":[4],"type":["int"],"align":["right"]},{"label":["oldpeak"],"name":[5],"type":["dbl"],"align":["right"]},{"label":["slope"],"name":[6],"type":["int"],"align":["right"]},{"label":["ca"],"name":[7],"type":["int"],"align":["right"]},{"label":["thal"],"name":[8],"type":["int"],"align":["right"]},{"label":["target"],"name":[9],"type":["int"],"align":["right"]},{"label":["age_groups"],"name":[10],"type":["fct"],"align":["left"]}],"data":[{"1":"63","2":"3","3":"150","4":"0","5":"2.3","6":"0","7":"0","8":"1","9":"1","10":"2","_rn_":"1"},{"1":"37","2":"2","3":"187","4":"0","5":"3.5","6":"0","7":"0","8":"2","9":"1","10":"0","_rn_":"2"},{"1":"41","2":"1","3":"172","4":"0","5":"1.4","6":"2","7":"0","8":"2","9":"1","10":"0","_rn_":"3"},{"1":"56","2":"1","3":"178","4":"0","5":"0.8","6":"2","7":"0","8":"2","9":"1","10":"2","_rn_":"4"},{"1":"57","2":"0","3":"163","4":"1","5":"0.6","6":"2","7":"0","8":"2","9":"1","10":"2","_rn_":"5"},{"1":"57","2":"0","3":"148","4":"0","5":"0.4","6":"1","7":"0","8":"1","9":"1","10":"2","_rn_":"6"},{"1":"56","2":"1","3":"153","4":"0","5":"1.3","6":"1","7":"0","8":"2","9":"1","10":"2","_rn_":"7"},{"1":"44","2":"1","3":"173","4":"0","5":"0.0","6":"2","7":"0","8":"3","9":"1","10":"0","_rn_":"8"},{"1":"52","2":"2","3":"162","4":"0","5":"0.5","6":"2","7":"0","8":"3","9":"1","10":"1","_rn_":"9"},{"1":"57","2":"2","3":"174","4":"0","5":"1.6","6":"2","7":"0","8":"2","9":"1","10":"2","_rn_":"10"},{"1":"54","2":"0","3":"160","4":"0","5":"1.2","6":"2","7":"0","8":"2","9":"1","10":"1","_rn_":"11"},{"1":"48","2":"2","3":"139","4":"0","5":"0.2","6":"2","7":"0","8":"2","9":"1","10":"1","_rn_":"12"},{"1":"49","2":"1","3":"171","4":"0","5":"0.6","6":"2","7":"0","8":"2","9":"1","10":"1","_rn_":"13"},{"1":"64","2":"3","3":"144","4":"1","5":"1.8","6":"1","7":"0","8":"2","9":"1","10":"2","_rn_":"14"},{"1":"58","2":"3","3":"162","4":"0","5":"1.0","6":"2","7":"0","8":"2","9":"1","10":"2","_rn_":"15"},{"1":"50","2":"2","3":"158","4":"0","5":"1.6","6":"1","7":"0","8":"2","9":"1","10":"1","_rn_":"16"},{"1":"58","2":"2","3":"172","4":"0","5":"0.0","6":"2","7":"0","8":"2","9":"1","10":"2","_rn_":"17"},{"1":"66","2":"3","3":"114","4":"0","5":"2.6","6":"0","7":"0","8":"2","9":"1","10":"2","_rn_":"18"},{"1":"43","2":"0","3":"171","4":"0","5":"1.5","6":"2","7":"0","8":"2","9":"1","10":"0","_rn_":"19"},{"1":"69","2":"3","3":"151","4":"0","5":"1.8","6":"2","7":"2","8":"2","9":"1","10":"2","_rn_":"20"},{"1":"59","2":"0","3":"161","4":"0","5":"0.5","6":"1","7":"0","8":"3","9":"1","10":"2","_rn_":"21"},{"1":"44","2":"2","3":"179","4":"1","5":"0.4","6":"2","7":"0","8":"2","9":"1","10":"0","_rn_":"22"},{"1":"42","2":"0","3":"178","4":"0","5":"0.0","6":"2","7":"0","8":"2","9":"1","10":"0","_rn_":"23"},{"1":"61","2":"2","3":"137","4":"1","5":"1.0","6":"1","7":"0","8":"2","9":"1","10":"2","_rn_":"24"},{"1":"40","2":"3","3":"178","4":"1","5":"1.4","6":"2","7":"0","8":"3","9":"1","10":"0","_rn_":"25"},{"1":"71","2":"1","3":"162","4":"0","5":"0.4","6":"2","7":"2","8":"2","9":"1","10":"2","_rn_":"26"},{"1":"59","2":"2","3":"157","4":"0","5":"1.6","6":"2","7":"0","8":"2","9":"1","10":"2","_rn_":"27"},{"1":"51","2":"2","3":"123","4":"0","5":"0.6","6":"2","7":"0","8":"2","9":"1","10":"1","_rn_":"28"},{"1":"65","2":"2","3":"157","4":"0","5":"0.8","6":"2","7":"1","8":"2","9":"1","10":"2","_rn_":"29"},{"1":"53","2":"2","3":"152","4":"0","5":"1.2","6":"0","7":"0","8":"2","9":"1","10":"1","_rn_":"30"},{"1":"41","2":"1","3":"168","4":"0","5":"0.0","6":"2","7":"1","8":"2","9":"1","10":"0","_rn_":"31"},{"1":"65","2":"0","3":"140","4":"0","5":"0.4","6":"2","7":"0","8":"3","9":"1","10":"2","_rn_":"32"},{"1":"44","2":"1","3":"188","4":"0","5":"0.0","6":"2","7":"0","8":"2","9":"1","10":"0","_rn_":"33"},{"1":"54","2":"2","3":"152","4":"0","5":"0.5","6":"0","7":"1","8":"2","9":"1","10":"1","_rn_":"34"},{"1":"51","2":"3","3":"125","4":"1","5":"1.4","6":"2","7":"1","8":"2","9":"1","10":"1","_rn_":"35"},{"1":"46","2":"2","3":"160","4":"1","5":"1.4","6":"0","7":"0","8":"2","9":"1","10":"1","_rn_":"36"},{"1":"54","2":"2","3":"170","4":"0","5":"0.0","6":"2","7":"0","8":"2","9":"1","10":"1","_rn_":"37"},{"1":"54","2":"2","3":"165","4":"0","5":"1.6","6":"2","7":"0","8":"3","9":"1","10":"1","_rn_":"38"},{"1":"65","2":"2","3":"148","4":"0","5":"0.8","6":"2","7":"0","8":"2","9":"1","10":"2","_rn_":"39"},{"1":"65","2":"2","3":"151","4":"0","5":"0.8","6":"2","7":"0","8":"2","9":"1","10":"2","_rn_":"40"},{"1":"51","2":"2","3":"142","4":"0","5":"1.5","6":"2","7":"1","8":"2","9":"1","10":"1","_rn_":"41"},{"1":"48","2":"1","3":"180","4":"0","5":"0.2","6":"1","7":"0","8":"2","9":"1","10":"1","_rn_":"42"},{"1":"45","2":"0","3":"148","4":"1","5":"3.0","6":"1","7":"0","8":"2","9":"1","10":"1","_rn_":"43"},{"1":"53","2":"0","3":"143","4":"0","5":"0.4","6":"1","7":"0","8":"2","9":"1","10":"1","_rn_":"44"},{"1":"39","2":"2","3":"182","4":"0","5":"0.0","6":"2","7":"0","8":"2","9":"1","10":"0","_rn_":"45"},{"1":"52","2":"1","3":"172","4":"0","5":"0.2","6":"2","7":"0","8":"2","9":"1","10":"1","_rn_":"46"},{"1":"44","2":"2","3":"180","4":"0","5":"0.0","6":"2","7":"0","8":"2","9":"1","10":"0","_rn_":"47"},{"1":"47","2":"2","3":"156","4":"0","5":"0.0","6":"2","7":"0","8":"2","9":"1","10":"1","_rn_":"48"},{"1":"53","2":"2","3":"115","4":"0","5":"0.0","6":"2","7":"0","8":"0","9":"1","10":"1","_rn_":"49"},{"1":"53","2":"0","3":"160","4":"0","5":"0.0","6":"2","7":"0","8":"2","9":"1","10":"1","_rn_":"50"},{"1":"51","2":"2","3":"149","4":"0","5":"0.5","6":"2","7":"0","8":"2","9":"1","10":"1","_rn_":"51"},{"1":"66","2":"0","3":"151","4":"0","5":"0.4","6":"1","7":"0","8":"2","9":"1","10":"2","_rn_":"52"},{"1":"62","2":"2","3":"146","4":"0","5":"1.8","6":"1","7":"3","8":"3","9":"1","10":"2","_rn_":"53"},{"1":"44","2":"2","3":"175","4":"0","5":"0.6","6":"1","7":"0","8":"2","9":"1","10":"0","_rn_":"54"},{"1":"63","2":"2","3":"172","4":"0","5":"0.0","6":"2","7":"0","8":"2","9":"1","10":"2","_rn_":"55"},{"1":"52","2":"1","3":"158","4":"0","5":"0.8","6":"2","7":"1","8":"2","9":"1","10":"1","_rn_":"56"},{"1":"48","2":"0","3":"186","4":"0","5":"0.0","6":"2","7":"0","8":"2","9":"1","10":"1","_rn_":"57"},{"1":"45","2":"0","3":"185","4":"0","5":"0.0","6":"2","7":"0","8":"2","9":"1","10":"1","_rn_":"58"},{"1":"34","2":"3","3":"174","4":"0","5":"0.0","6":"2","7":"0","8":"2","9":"1","10":"0","_rn_":"59"},{"1":"57","2":"0","3":"159","4":"0","5":"0.0","6":"2","7":"1","8":"2","9":"1","10":"2","_rn_":"60"},{"1":"71","2":"2","3":"130","4":"0","5":"0.0","6":"2","7":"1","8":"2","9":"1","10":"2","_rn_":"61"},{"1":"54","2":"1","3":"156","4":"0","5":"0.0","6":"2","7":"0","8":"3","9":"1","10":"1","_rn_":"62"},{"1":"52","2":"3","3":"190","4":"0","5":"0.0","6":"1","7":"0","8":"1","9":"1","10":"1","_rn_":"63"},{"1":"41","2":"1","3":"132","4":"0","5":"0.0","6":"1","7":"0","8":"1","9":"1","10":"0","_rn_":"64"},{"1":"58","2":"2","3":"165","4":"0","5":"0.0","6":"2","7":"0","8":"2","9":"1","10":"2","_rn_":"65"},{"1":"35","2":"0","3":"182","4":"0","5":"1.4","6":"2","7":"0","8":"2","9":"1","10":"0","_rn_":"66"},{"1":"51","2":"2","3":"143","4":"1","5":"1.2","6":"1","7":"0","8":"2","9":"1","10":"1","_rn_":"67"},{"1":"45","2":"1","3":"175","4":"0","5":"0.6","6":"1","7":"0","8":"2","9":"1","10":"1","_rn_":"68"},{"1":"44","2":"1","3":"170","4":"0","5":"0.0","6":"2","7":"0","8":"2","9":"1","10":"0","_rn_":"69"},{"1":"62","2":"0","3":"163","4":"0","5":"0.0","6":"2","7":"0","8":"2","9":"1","10":"2","_rn_":"70"},{"1":"54","2":"2","3":"147","4":"0","5":"0.4","6":"1","7":"0","8":"3","9":"1","10":"1","_rn_":"71"},{"1":"51","2":"2","3":"154","4":"1","5":"0.0","6":"2","7":"1","8":"3","9":"1","10":"1","_rn_":"72"},{"1":"29","2":"1","3":"202","4":"0","5":"0.0","6":"2","7":"0","8":"2","9":"1","10":"0","_rn_":"73"},{"1":"51","2":"0","3":"186","4":"1","5":"0.0","6":"2","7":"0","8":"2","9":"1","10":"1","_rn_":"74"},{"1":"43","2":"2","3":"165","4":"0","5":"0.2","6":"1","7":"0","8":"2","9":"1","10":"0","_rn_":"75"},{"1":"55","2":"1","3":"161","4":"0","5":"1.4","6":"1","7":"0","8":"2","9":"1","10":"2","_rn_":"76"},{"1":"51","2":"2","3":"166","4":"0","5":"2.4","6":"1","7":"0","8":"2","9":"1","10":"1","_rn_":"77"},{"1":"59","2":"1","3":"164","4":"1","5":"0.0","6":"2","7":"0","8":"2","9":"1","10":"2","_rn_":"78"},{"1":"52","2":"1","3":"184","4":"0","5":"0.0","6":"2","7":"0","8":"2","9":"1","10":"1","_rn_":"79"},{"1":"58","2":"2","3":"154","4":"1","5":"0.6","6":"1","7":"0","8":"3","9":"1","10":"2","_rn_":"80"},{"1":"41","2":"2","3":"179","4":"0","5":"0.0","6":"2","7":"0","8":"2","9":"1","10":"0","_rn_":"81"},{"1":"45","2":"1","3":"170","4":"0","5":"0.0","6":"2","7":"0","8":"2","9":"1","10":"1","_rn_":"82"},{"1":"60","2":"2","3":"160","4":"0","5":"0.0","6":"2","7":"1","8":"2","9":"1","10":"2","_rn_":"83"},{"1":"52","2":"3","3":"178","4":"0","5":"1.2","6":"1","7":"0","8":"3","9":"1","10":"1","_rn_":"84"},{"1":"42","2":"0","3":"122","4":"0","5":"0.6","6":"1","7":"0","8":"2","9":"1","10":"0","_rn_":"85"},{"1":"67","2":"2","3":"160","4":"0","5":"1.6","6":"1","7":"0","8":"3","9":"1","10":"2","_rn_":"86"},{"1":"68","2":"2","3":"151","4":"0","5":"1.0","6":"2","7":"1","8":"3","9":"1","10":"2","_rn_":"87"},{"1":"46","2":"1","3":"156","4":"0","5":"0.0","6":"2","7":"0","8":"3","9":"1","10":"1","_rn_":"88"},{"1":"54","2":"2","3":"158","4":"0","5":"1.6","6":"1","7":"0","8":"2","9":"1","10":"1","_rn_":"89"},{"1":"58","2":"0","3":"122","4":"0","5":"1.0","6":"1","7":"0","8":"2","9":"1","10":"2","_rn_":"90"},{"1":"48","2":"2","3":"175","4":"0","5":"0.0","6":"2","7":"2","8":"2","9":"1","10":"1","_rn_":"91"},{"1":"57","2":"0","3":"168","4":"1","5":"0.0","6":"2","7":"0","8":"3","9":"1","10":"2","_rn_":"92"},{"1":"52","2":"2","3":"169","4":"0","5":"0.0","6":"2","7":"4","8":"2","9":"1","10":"1","_rn_":"93"},{"1":"54","2":"1","3":"159","4":"1","5":"0.0","6":"2","7":"1","8":"2","9":"1","10":"1","_rn_":"94"},{"1":"45","2":"1","3":"138","4":"0","5":"0.0","6":"1","7":"0","8":"2","9":"1","10":"1","_rn_":"95"},{"1":"53","2":"0","3":"111","4":"1","5":"0.0","6":"2","7":"0","8":"3","9":"1","10":"1","_rn_":"96"},{"1":"62","2":"0","3":"157","4":"0","5":"1.2","6":"1","7":"0","8":"2","9":"1","10":"2","_rn_":"97"},{"1":"52","2":"0","3":"147","4":"0","5":"0.1","6":"2","7":"3","8":"3","9":"1","10":"1","_rn_":"98"},{"1":"43","2":"2","3":"162","4":"0","5":"1.9","6":"2","7":"1","8":"2","9":"1","10":"0","_rn_":"99"},{"1":"53","2":"2","3":"173","4":"0","5":"0.0","6":"2","7":"3","8":"2","9":"1","10":"1","_rn_":"100"},{"1":"42","2":"3","3":"178","4":"0","5":"0.8","6":"2","7":"2","8":"2","9":"1","10":"0","_rn_":"101"},{"1":"59","2":"3","3":"145","4":"0","5":"4.2","6":"0","7":"0","8":"3","9":"1","10":"2","_rn_":"102"},{"1":"63","2":"1","3":"179","4":"0","5":"0.0","6":"2","7":"2","8":"2","9":"1","10":"2","_rn_":"103"},{"1":"42","2":"2","3":"194","4":"0","5":"0.8","6":"0","7":"0","8":"3","9":"1","10":"0","_rn_":"104"},{"1":"50","2":"2","3":"163","4":"0","5":"0.0","6":"2","7":"0","8":"2","9":"1","10":"1","_rn_":"105"},{"1":"68","2":"2","3":"115","4":"0","5":"1.5","6":"1","7":"0","8":"2","9":"1","10":"2","_rn_":"106"},{"1":"69","2":"3","3":"131","4":"0","5":"0.1","6":"1","7":"1","8":"2","9":"1","10":"2","_rn_":"107"},{"1":"45","2":"0","3":"152","4":"1","5":"0.2","6":"1","7":"0","8":"2","9":"1","10":"1","_rn_":"108"},{"1":"50","2":"1","3":"162","4":"0","5":"1.1","6":"2","7":"0","8":"2","9":"1","10":"1","_rn_":"109"},{"1":"50","2":"0","3":"159","4":"0","5":"0.0","6":"2","7":"0","8":"2","9":"1","10":"1","_rn_":"110"},{"1":"64","2":"0","3":"154","4":"1","5":"0.0","6":"2","7":"0","8":"2","9":"1","10":"2","_rn_":"111"},{"1":"57","2":"2","3":"173","4":"0","5":"0.2","6":"2","7":"1","8":"3","9":"1","10":"2","_rn_":"112"},{"1":"64","2":"2","3":"133","4":"0","5":"0.2","6":"2","7":"0","8":"3","9":"1","10":"2","_rn_":"113"},{"1":"43","2":"0","3":"161","4":"0","5":"0.0","6":"2","7":"0","8":"3","9":"1","10":"0","_rn_":"114"},{"1":"55","2":"1","3":"155","4":"0","5":"0.0","6":"2","7":"0","8":"2","9":"1","10":"2","_rn_":"115"},{"1":"37","2":"2","3":"170","4":"0","5":"0.0","6":"2","7":"0","8":"2","9":"1","10":"0","_rn_":"116"},{"1":"41","2":"2","3":"168","4":"0","5":"2.0","6":"1","7":"0","8":"2","9":"1","10":"0","_rn_":"117"},{"1":"56","2":"3","3":"162","4":"0","5":"1.9","6":"1","7":"0","8":"3","9":"1","10":"2","_rn_":"118"},{"1":"46","2":"1","3":"172","4":"0","5":"0.0","6":"2","7":"0","8":"2","9":"1","10":"1","_rn_":"119"},{"1":"46","2":"0","3":"152","4":"1","5":"0.0","6":"1","7":"0","8":"2","9":"1","10":"1","_rn_":"120"},{"1":"64","2":"0","3":"122","4":"0","5":"2.0","6":"1","7":"2","8":"2","9":"1","10":"2","_rn_":"121"},{"1":"59","2":"0","3":"182","4":"0","5":"0.0","6":"2","7":"0","8":"2","9":"1","10":"2","_rn_":"122"},{"1":"41","2":"2","3":"172","4":"1","5":"0.0","6":"2","7":"0","8":"2","9":"1","10":"0","_rn_":"123"},{"1":"54","2":"2","3":"167","4":"0","5":"0.0","6":"2","7":"0","8":"2","9":"1","10":"1","_rn_":"124"},{"1":"39","2":"2","3":"179","4":"0","5":"0.0","6":"2","7":"0","8":"2","9":"1","10":"0","_rn_":"125"},{"1":"34","2":"1","3":"192","4":"0","5":"0.7","6":"2","7":"0","8":"2","9":"1","10":"0","_rn_":"126"},{"1":"47","2":"0","3":"143","4":"0","5":"0.1","6":"2","7":"0","8":"2","9":"1","10":"1","_rn_":"127"},{"1":"67","2":"2","3":"172","4":"0","5":"0.0","6":"2","7":"1","8":"2","9":"1","10":"2","_rn_":"128"},{"1":"52","2":"2","3":"169","4":"0","5":"0.1","6":"1","7":"0","8":"2","9":"1","10":"1","_rn_":"129"},{"1":"74","2":"1","3":"121","4":"1","5":"0.2","6":"2","7":"1","8":"2","9":"1","10":"2","_rn_":"130"},{"1":"54","2":"2","3":"163","4":"0","5":"0.0","6":"2","7":"1","8":"2","9":"1","10":"1","_rn_":"131"},{"1":"49","2":"1","3":"162","4":"0","5":"0.0","6":"1","7":"0","8":"2","9":"1","10":"1","_rn_":"132"},{"1":"42","2":"1","3":"162","4":"0","5":"0.0","6":"2","7":"0","8":"2","9":"1","10":"0","_rn_":"133"},{"1":"41","2":"1","3":"153","4":"0","5":"0.0","6":"2","7":"0","8":"2","9":"1","10":"0","_rn_":"134"},{"1":"41","2":"1","3":"163","4":"0","5":"0.0","6":"2","7":"0","8":"2","9":"1","10":"0","_rn_":"135"},{"1":"49","2":"0","3":"163","4":"0","5":"0.0","6":"2","7":"0","8":"2","9":"1","10":"1","_rn_":"136"},{"1":"60","2":"2","3":"96","4":"0","5":"0.0","6":"2","7":"0","8":"2","9":"1","10":"2","_rn_":"137"},{"1":"62","2":"1","3":"140","4":"0","5":"0.0","6":"2","7":"0","8":"2","9":"1","10":"2","_rn_":"138"},{"1":"57","2":"0","3":"126","4":"1","5":"1.5","6":"1","7":"0","8":"1","9":"1","10":"2","_rn_":"139"},{"1":"64","2":"0","3":"105","4":"1","5":"0.2","6":"1","7":"1","8":"3","9":"1","10":"2","_rn_":"140"},{"1":"51","2":"2","3":"157","4":"0","5":"0.6","6":"2","7":"0","8":"2","9":"1","10":"1","_rn_":"141"},{"1":"43","2":"0","3":"181","4":"0","5":"1.2","6":"1","7":"0","8":"2","9":"1","10":"0","_rn_":"142"},{"1":"42","2":"2","3":"173","4":"0","5":"0.0","6":"1","7":"0","8":"2","9":"1","10":"0","_rn_":"143"},{"1":"67","2":"0","3":"142","4":"0","5":"0.3","6":"2","7":"2","8":"2","9":"1","10":"2","_rn_":"144"},{"1":"76","2":"2","3":"116","4":"0","5":"1.1","6":"1","7":"0","8":"2","9":"1","10":"2","_rn_":"145"},{"1":"70","2":"1","3":"143","4":"0","5":"0.0","6":"2","7":"0","8":"2","9":"1","10":"2","_rn_":"146"},{"1":"44","2":"2","3":"149","4":"0","5":"0.3","6":"1","7":"1","8":"2","9":"1","10":"0","_rn_":"147"},{"1":"60","2":"3","3":"171","4":"0","5":"0.9","6":"2","7":"0","8":"2","9":"1","10":"2","_rn_":"148"},{"1":"44","2":"2","3":"169","4":"0","5":"0.0","6":"2","7":"0","8":"2","9":"1","10":"0","_rn_":"149"},{"1":"42","2":"2","3":"150","4":"0","5":"0.0","6":"2","7":"0","8":"2","9":"1","10":"0","_rn_":"150"},{"1":"66","2":"0","3":"138","4":"0","5":"2.3","6":"2","7":"0","8":"1","9":"1","10":"2","_rn_":"151"},{"1":"71","2":"0","3":"125","4":"0","5":"1.6","6":"1","7":"0","8":"2","9":"1","10":"2","_rn_":"152"},{"1":"64","2":"3","3":"155","4":"0","5":"0.6","6":"1","7":"0","8":"3","9":"1","10":"2","_rn_":"153"},{"1":"66","2":"2","3":"152","4":"0","5":"0.0","6":"1","7":"1","8":"2","9":"1","10":"2","_rn_":"154"},{"1":"39","2":"2","3":"152","4":"0","5":"0.0","6":"1","7":"0","8":"2","9":"1","10":"0","_rn_":"155"},{"1":"58","2":"0","3":"131","4":"0","5":"0.6","6":"1","7":"0","8":"2","9":"1","10":"2","_rn_":"156"},{"1":"47","2":"2","3":"179","4":"0","5":"0.0","6":"2","7":"0","8":"2","9":"1","10":"1","_rn_":"157"},{"1":"35","2":"1","3":"174","4":"0","5":"0.0","6":"2","7":"0","8":"2","9":"1","10":"0","_rn_":"158"},{"1":"58","2":"1","3":"144","4":"0","5":"0.4","6":"1","7":"4","8":"3","9":"1","10":"2","_rn_":"159"},{"1":"56","2":"1","3":"163","4":"0","5":"0.0","6":"2","7":"0","8":"3","9":"1","10":"2","_rn_":"160"},{"1":"56","2":"1","3":"169","4":"0","5":"0.0","6":"0","7":"0","8":"2","9":"1","10":"2","_rn_":"161"},{"1":"55","2":"1","3":"166","4":"0","5":"1.2","6":"2","7":"0","8":"2","9":"1","10":"2","_rn_":"162"},{"1":"41","2":"1","3":"182","4":"0","5":"0.0","6":"2","7":"0","8":"2","9":"1","10":"0","_rn_":"163"},{"1":"38","2":"2","3":"173","4":"0","5":"0.0","6":"2","7":"4","8":"2","9":"1","10":"0","_rn_":"164"},{"1":"38","2":"2","3":"173","4":"0","5":"0.0","6":"2","7":"4","8":"2","9":"1","10":"0","_rn_":"165"},{"1":"67","2":"0","3":"108","4":"1","5":"1.5","6":"1","7":"3","8":"2","9":"0","10":"2","_rn_":"166"},{"1":"67","2":"0","3":"129","4":"1","5":"2.6","6":"1","7":"2","8":"3","9":"0","10":"2","_rn_":"167"},{"1":"62","2":"0","3":"160","4":"0","5":"3.6","6":"0","7":"2","8":"2","9":"0","10":"2","_rn_":"168"},{"1":"63","2":"0","3":"147","4":"0","5":"1.4","6":"1","7":"1","8":"3","9":"0","10":"2","_rn_":"169"},{"1":"53","2":"0","3":"155","4":"1","5":"3.1","6":"0","7":"0","8":"3","9":"0","10":"1","_rn_":"170"},{"1":"56","2":"2","3":"142","4":"1","5":"0.6","6":"1","7":"1","8":"1","9":"0","10":"2","_rn_":"171"},{"1":"48","2":"1","3":"168","4":"0","5":"1.0","6":"0","7":"0","8":"3","9":"0","10":"1","_rn_":"172"},{"1":"58","2":"1","3":"160","4":"0","5":"1.8","6":"1","7":"0","8":"2","9":"0","10":"2","_rn_":"173"},{"1":"58","2":"2","3":"173","4":"0","5":"3.2","6":"2","7":"2","8":"3","9":"0","10":"2","_rn_":"174"},{"1":"60","2":"0","3":"132","4":"1","5":"2.4","6":"1","7":"2","8":"3","9":"0","10":"2","_rn_":"175"},{"1":"40","2":"0","3":"114","4":"1","5":"2.0","6":"1","7":"0","8":"3","9":"0","10":"0","_rn_":"176"},{"1":"60","2":"0","3":"160","4":"1","5":"1.4","6":"2","7":"2","8":"3","9":"0","10":"2","_rn_":"177"},{"1":"64","2":"2","3":"158","4":"0","5":"0.0","6":"2","7":"0","8":"2","9":"0","10":"2","_rn_":"178"},{"1":"43","2":"0","3":"120","4":"1","5":"2.5","6":"1","7":"0","8":"3","9":"0","10":"0","_rn_":"179"},{"1":"57","2":"0","3":"112","4":"1","5":"0.6","6":"1","7":"1","8":"1","9":"0","10":"2","_rn_":"180"},{"1":"55","2":"0","3":"132","4":"1","5":"1.2","6":"1","7":"1","8":"3","9":"0","10":"2","_rn_":"181"},{"1":"65","2":"0","3":"114","4":"0","5":"1.0","6":"1","7":"3","8":"3","9":"0","10":"2","_rn_":"182"},{"1":"61","2":"0","3":"169","4":"0","5":"0.0","6":"2","7":"0","8":"2","9":"0","10":"2","_rn_":"183"},{"1":"58","2":"2","3":"165","4":"0","5":"2.5","6":"1","7":"1","8":"3","9":"0","10":"2","_rn_":"184"},{"1":"50","2":"0","3":"128","4":"0","5":"2.6","6":"1","7":"0","8":"3","9":"0","10":"1","_rn_":"185"},{"1":"44","2":"0","3":"153","4":"0","5":"0.0","6":"2","7":"1","8":"2","9":"0","10":"0","_rn_":"186"},{"1":"60","2":"0","3":"144","4":"1","5":"1.4","6":"2","7":"1","8":"3","9":"0","10":"2","_rn_":"187"},{"1":"54","2":"0","3":"109","4":"1","5":"2.2","6":"1","7":"1","8":"3","9":"0","10":"1","_rn_":"188"},{"1":"50","2":"2","3":"163","4":"0","5":"0.6","6":"1","7":"1","8":"3","9":"0","10":"1","_rn_":"189"},{"1":"41","2":"0","3":"158","4":"0","5":"0.0","6":"2","7":"0","8":"3","9":"0","10":"0","_rn_":"190"},{"1":"51","2":"0","3":"142","4":"1","5":"1.2","6":"1","7":"0","8":"3","9":"0","10":"1","_rn_":"191"},{"1":"58","2":"0","3":"131","4":"1","5":"2.2","6":"1","7":"3","8":"3","9":"0","10":"2","_rn_":"192"},{"1":"54","2":"0","3":"113","4":"0","5":"1.4","6":"1","7":"1","8":"3","9":"0","10":"1","_rn_":"193"},{"1":"60","2":"0","3":"142","4":"1","5":"2.8","6":"1","7":"2","8":"3","9":"0","10":"2","_rn_":"194"},{"1":"60","2":"2","3":"155","4":"0","5":"3.0","6":"1","7":"0","8":"2","9":"0","10":"2","_rn_":"195"},{"1":"59","2":"0","3":"140","4":"1","5":"3.4","6":"0","7":"0","8":"3","9":"0","10":"2","_rn_":"196"},{"1":"46","2":"2","3":"147","4":"0","5":"3.6","6":"1","7":"0","8":"2","9":"0","10":"1","_rn_":"197"},{"1":"67","2":"0","3":"163","4":"0","5":"0.2","6":"1","7":"2","8":"3","9":"0","10":"2","_rn_":"198"},{"1":"62","2":"0","3":"99","4":"1","5":"1.8","6":"1","7":"2","8":"3","9":"0","10":"2","_rn_":"199"},{"1":"65","2":"0","3":"158","4":"0","5":"0.6","6":"2","7":"2","8":"1","9":"0","10":"2","_rn_":"200"},{"1":"44","2":"0","3":"177","4":"0","5":"0.0","6":"2","7":"1","8":"2","9":"0","10":"0","_rn_":"201"},{"1":"60","2":"0","3":"141","4":"1","5":"2.8","6":"1","7":"1","8":"3","9":"0","10":"2","_rn_":"202"},{"1":"58","2":"0","3":"111","4":"1","5":"0.8","6":"2","7":"0","8":"3","9":"0","10":"2","_rn_":"203"},{"1":"68","2":"2","3":"150","4":"1","5":"1.6","6":"1","7":"0","8":"3","9":"0","10":"2","_rn_":"204"},{"1":"62","2":"0","3":"145","4":"0","5":"6.2","6":"0","7":"3","8":"3","9":"0","10":"2","_rn_":"205"},{"1":"52","2":"0","3":"161","4":"1","5":"0.0","6":"2","7":"1","8":"3","9":"0","10":"1","_rn_":"206"},{"1":"59","2":"0","3":"142","4":"1","5":"1.2","6":"1","7":"1","8":"3","9":"0","10":"2","_rn_":"207"},{"1":"60","2":"0","3":"157","4":"0","5":"2.6","6":"1","7":"2","8":"3","9":"0","10":"2","_rn_":"208"},{"1":"49","2":"2","3":"139","4":"0","5":"2.0","6":"1","7":"3","8":"3","9":"0","10":"1","_rn_":"209"},{"1":"59","2":"0","3":"162","4":"1","5":"0.0","6":"2","7":"1","8":"3","9":"0","10":"2","_rn_":"210"},{"1":"57","2":"2","3":"150","4":"0","5":"0.4","6":"1","7":"1","8":"3","9":"0","10":"2","_rn_":"211"},{"1":"61","2":"0","3":"140","4":"1","5":"3.6","6":"1","7":"1","8":"3","9":"0","10":"2","_rn_":"212"},{"1":"39","2":"0","3":"140","4":"0","5":"1.2","6":"1","7":"0","8":"3","9":"0","10":"0","_rn_":"213"},{"1":"61","2":"0","3":"146","4":"1","5":"1.0","6":"1","7":"0","8":"3","9":"0","10":"2","_rn_":"214"},{"1":"56","2":"0","3":"144","4":"1","5":"1.2","6":"1","7":"1","8":"2","9":"0","10":"2","_rn_":"215"},{"1":"43","2":"0","3":"136","4":"1","5":"3.0","6":"1","7":"0","8":"3","9":"0","10":"0","_rn_":"216"},{"1":"62","2":"2","3":"97","4":"0","5":"1.2","6":"1","7":"1","8":"3","9":"0","10":"2","_rn_":"217"},{"1":"63","2":"0","3":"132","4":"1","5":"1.8","6":"2","7":"3","8":"3","9":"0","10":"2","_rn_":"218"},{"1":"65","2":"0","3":"127","4":"0","5":"2.8","6":"1","7":"1","8":"3","9":"0","10":"2","_rn_":"219"},{"1":"48","2":"0","3":"150","4":"1","5":"0.0","6":"2","7":"2","8":"3","9":"0","10":"1","_rn_":"220"},{"1":"63","2":"0","3":"154","4":"0","5":"4.0","6":"1","7":"3","8":"3","9":"0","10":"2","_rn_":"221"},{"1":"55","2":"0","3":"111","4":"1","5":"5.6","6":"0","7":"0","8":"3","9":"0","10":"2","_rn_":"222"},{"1":"65","2":"3","3":"174","4":"0","5":"1.4","6":"1","7":"1","8":"2","9":"0","10":"2","_rn_":"223"},{"1":"56","2":"0","3":"133","4":"1","5":"4.0","6":"0","7":"2","8":"3","9":"0","10":"2","_rn_":"224"},{"1":"54","2":"0","3":"126","4":"1","5":"2.8","6":"1","7":"1","8":"3","9":"0","10":"1","_rn_":"225"},{"1":"70","2":"0","3":"125","4":"1","5":"2.6","6":"0","7":"0","8":"3","9":"0","10":"2","_rn_":"226"},{"1":"62","2":"1","3":"103","4":"0","5":"1.4","6":"1","7":"1","8":"3","9":"0","10":"2","_rn_":"227"},{"1":"35","2":"0","3":"130","4":"1","5":"1.6","6":"1","7":"0","8":"3","9":"0","10":"0","_rn_":"228"},{"1":"59","2":"3","3":"159","4":"0","5":"0.2","6":"1","7":"0","8":"3","9":"0","10":"2","_rn_":"229"},{"1":"64","2":"2","3":"131","4":"1","5":"1.8","6":"1","7":"0","8":"3","9":"0","10":"2","_rn_":"230"},{"1":"47","2":"2","3":"152","4":"0","5":"0.0","6":"2","7":"0","8":"2","9":"0","10":"1","_rn_":"231"},{"1":"57","2":"0","3":"124","4":"0","5":"1.0","6":"1","7":"3","8":"3","9":"0","10":"2","_rn_":"232"},{"1":"55","2":"0","3":"145","4":"1","5":"0.8","6":"1","7":"1","8":"3","9":"0","10":"2","_rn_":"233"},{"1":"64","2":"0","3":"96","4":"1","5":"2.2","6":"0","7":"1","8":"2","9":"0","10":"2","_rn_":"234"},{"1":"70","2":"0","3":"109","4":"0","5":"2.4","6":"1","7":"3","8":"2","9":"0","10":"2","_rn_":"235"},{"1":"51","2":"0","3":"173","4":"1","5":"1.6","6":"2","7":"0","8":"3","9":"0","10":"1","_rn_":"236"},{"1":"58","2":"0","3":"171","4":"0","5":"0.0","6":"2","7":"2","8":"3","9":"0","10":"2","_rn_":"237"},{"1":"60","2":"0","3":"170","4":"0","5":"1.2","6":"1","7":"2","8":"3","9":"0","10":"2","_rn_":"238"},{"1":"77","2":"0","3":"162","4":"1","5":"0.0","6":"2","7":"3","8":"2","9":"0","10":"2","_rn_":"239"},{"1":"35","2":"0","3":"156","4":"1","5":"0.0","6":"2","7":"0","8":"3","9":"0","10":"0","_rn_":"240"},{"1":"70","2":"2","3":"112","4":"1","5":"2.9","6":"1","7":"1","8":"3","9":"0","10":"2","_rn_":"241"},{"1":"59","2":"0","3":"143","4":"1","5":"0.0","6":"1","7":"0","8":"2","9":"0","10":"2","_rn_":"242"},{"1":"64","2":"0","3":"132","4":"0","5":"2.0","6":"1","7":"2","8":"1","9":"0","10":"2","_rn_":"243"},{"1":"57","2":"0","3":"88","4":"1","5":"1.2","6":"1","7":"1","8":"3","9":"0","10":"2","_rn_":"244"},{"1":"56","2":"0","3":"105","4":"1","5":"2.1","6":"1","7":"1","8":"1","9":"0","10":"2","_rn_":"245"},{"1":"48","2":"0","3":"166","4":"0","5":"0.5","6":"1","7":"0","8":"3","9":"0","10":"1","_rn_":"246"},{"1":"56","2":"0","3":"150","4":"1","5":"1.9","6":"1","7":"2","8":"3","9":"0","10":"2","_rn_":"247"},{"1":"66","2":"1","3":"120","4":"1","5":"0.0","6":"1","7":"3","8":"1","9":"0","10":"2","_rn_":"248"},{"1":"54","2":"1","3":"195","4":"0","5":"0.0","6":"2","7":"1","8":"3","9":"0","10":"1","_rn_":"249"},{"1":"69","2":"2","3":"146","4":"0","5":"2.0","6":"1","7":"3","8":"3","9":"0","10":"2","_rn_":"250"},{"1":"51","2":"0","3":"122","4":"1","5":"4.2","6":"1","7":"3","8":"3","9":"0","10":"1","_rn_":"251"},{"1":"43","2":"0","3":"143","4":"1","5":"0.1","6":"1","7":"4","8":"3","9":"0","10":"0","_rn_":"252"},{"1":"62","2":"0","3":"106","4":"0","5":"1.9","6":"1","7":"3","8":"2","9":"0","10":"2","_rn_":"253"},{"1":"67","2":"0","3":"125","4":"1","5":"0.9","6":"1","7":"2","8":"2","9":"0","10":"2","_rn_":"254"},{"1":"59","2":"3","3":"125","4":"0","5":"0.0","6":"2","7":"0","8":"2","9":"0","10":"2","_rn_":"255"},{"1":"45","2":"0","3":"147","4":"1","5":"0.0","6":"1","7":"3","8":"3","9":"0","10":"1","_rn_":"256"},{"1":"58","2":"0","3":"130","4":"1","5":"3.0","6":"1","7":"2","8":"3","9":"0","10":"2","_rn_":"257"},{"1":"50","2":"0","3":"126","4":"1","5":"0.9","6":"1","7":"0","8":"3","9":"0","10":"1","_rn_":"258"},{"1":"62","2":"0","3":"154","4":"1","5":"1.4","6":"1","7":"0","8":"2","9":"0","10":"2","_rn_":"259"},{"1":"38","2":"3","3":"182","4":"1","5":"3.8","6":"1","7":"0","8":"3","9":"0","10":"0","_rn_":"260"},{"1":"66","2":"0","3":"165","4":"1","5":"1.0","6":"1","7":"2","8":"3","9":"0","10":"2","_rn_":"261"},{"1":"52","2":"0","3":"160","4":"0","5":"0.0","6":"2","7":"1","8":"2","9":"0","10":"1","_rn_":"262"},{"1":"53","2":"0","3":"95","4":"1","5":"2.0","6":"1","7":"2","8":"3","9":"0","10":"1","_rn_":"263"},{"1":"63","2":"0","3":"169","4":"1","5":"1.8","6":"1","7":"2","8":"2","9":"0","10":"2","_rn_":"264"},{"1":"54","2":"0","3":"108","4":"1","5":"0.0","6":"1","7":"1","8":"2","9":"0","10":"1","_rn_":"265"},{"1":"66","2":"0","3":"132","4":"1","5":"0.1","6":"2","7":"1","8":"2","9":"0","10":"2","_rn_":"266"},{"1":"55","2":"0","3":"117","4":"1","5":"3.4","6":"1","7":"0","8":"2","9":"0","10":"2","_rn_":"267"},{"1":"49","2":"2","3":"126","4":"0","5":"0.8","6":"2","7":"3","8":"2","9":"0","10":"1","_rn_":"268"},{"1":"54","2":"0","3":"116","4":"1","5":"3.2","6":"1","7":"2","8":"2","9":"0","10":"1","_rn_":"269"},{"1":"56","2":"0","3":"103","4":"1","5":"1.6","6":"0","7":"0","8":"3","9":"0","10":"2","_rn_":"270"},{"1":"46","2":"0","3":"144","4":"0","5":"0.8","6":"2","7":"0","8":"3","9":"0","10":"1","_rn_":"271"},{"1":"61","2":"3","3":"145","4":"0","5":"2.6","6":"1","7":"2","8":"2","9":"0","10":"2","_rn_":"272"},{"1":"67","2":"0","3":"71","4":"0","5":"1.0","6":"1","7":"0","8":"2","9":"0","10":"2","_rn_":"273"},{"1":"58","2":"0","3":"156","4":"0","5":"0.1","6":"2","7":"1","8":"3","9":"0","10":"2","_rn_":"274"},{"1":"47","2":"0","3":"118","4":"1","5":"1.0","6":"1","7":"1","8":"2","9":"0","10":"1","_rn_":"275"},{"1":"52","2":"0","3":"168","4":"0","5":"1.0","6":"2","7":"2","8":"3","9":"0","10":"1","_rn_":"276"},{"1":"58","2":"0","3":"105","4":"0","5":"2.0","6":"1","7":"1","8":"3","9":"0","10":"2","_rn_":"277"},{"1":"57","2":"1","3":"141","4":"0","5":"0.3","6":"2","7":"0","8":"3","9":"0","10":"2","_rn_":"278"},{"1":"58","2":"1","3":"152","4":"0","5":"0.0","6":"2","7":"2","8":"2","9":"0","10":"2","_rn_":"279"},{"1":"61","2":"0","3":"125","4":"1","5":"3.6","6":"1","7":"1","8":"2","9":"0","10":"2","_rn_":"280"},{"1":"42","2":"0","3":"125","4":"1","5":"1.8","6":"1","7":"0","8":"1","9":"0","10":"0","_rn_":"281"},{"1":"52","2":"0","3":"156","4":"1","5":"1.0","6":"1","7":"0","8":"0","9":"0","10":"1","_rn_":"282"},{"1":"59","2":"2","3":"134","4":"0","5":"2.2","6":"1","7":"1","8":"1","9":"0","10":"2","_rn_":"283"},{"1":"40","2":"0","3":"181","4":"0","5":"0.0","6":"2","7":"0","8":"3","9":"0","10":"0","_rn_":"284"},{"1":"61","2":"0","3":"138","4":"1","5":"1.9","6":"2","7":"1","8":"3","9":"0","10":"2","_rn_":"285"},{"1":"46","2":"0","3":"120","4":"1","5":"1.8","6":"1","7":"2","8":"3","9":"0","10":"1","_rn_":"286"},{"1":"59","2":"3","3":"162","4":"0","5":"0.8","6":"2","7":"2","8":"2","9":"0","10":"2","_rn_":"287"},{"1":"57","2":"1","3":"164","4":"0","5":"0.0","6":"2","7":"1","8":"2","9":"0","10":"2","_rn_":"288"},{"1":"57","2":"0","3":"143","4":"1","5":"3.0","6":"1","7":"1","8":"3","9":"0","10":"2","_rn_":"289"},{"1":"55","2":"0","3":"130","4":"1","5":"2.0","6":"1","7":"1","8":"3","9":"0","10":"2","_rn_":"290"},{"1":"61","2":"0","3":"161","4":"0","5":"0.0","6":"2","7":"1","8":"3","9":"0","10":"2","_rn_":"291"},{"1":"58","2":"0","3":"140","4":"0","5":"4.4","6":"0","7":"3","8":"1","9":"0","10":"2","_rn_":"292"},{"1":"58","2":"0","3":"146","4":"1","5":"2.8","6":"1","7":"2","8":"1","9":"0","10":"2","_rn_":"293"},{"1":"67","2":"2","3":"150","4":"0","5":"0.8","6":"1","7":"0","8":"3","9":"0","10":"2","_rn_":"294"},{"1":"44","2":"0","3":"144","4":"1","5":"2.8","6":"0","7":"0","8":"1","9":"0","10":"0","_rn_":"295"},{"1":"63","2":"0","3":"144","4":"1","5":"4.0","6":"2","7":"2","8":"3","9":"0","10":"2","_rn_":"296"},{"1":"63","2":"0","3":"136","4":"1","5":"0.0","6":"1","7":"0","8":"2","9":"0","10":"2","_rn_":"297"},{"1":"59","2":"0","3":"90","4":"0","5":"1.0","6":"1","7":"2","8":"1","9":"0","10":"2","_rn_":"298"},{"1":"57","2":"0","3":"123","4":"1","5":"0.2","6":"1","7":"0","8":"3","9":"0","10":"2","_rn_":"299"},{"1":"45","2":"3","3":"132","4":"0","5":"1.2","6":"1","7":"0","8":"3","9":"0","10":"1","_rn_":"300"},{"1":"68","2":"0","3":"141","4":"0","5":"3.4","6":"1","7":"2","8":"3","9":"0","10":"2","_rn_":"301"},{"1":"57","2":"0","3":"115","4":"1","5":"1.2","6":"1","7":"1","8":"3","9":"0","10":"2","_rn_":"302"},{"1":"57","2":"1","3":"174","4":"0","5":"0.0","6":"1","7":"1","8":"2","9":"0","10":"2","_rn_":"303"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+<pre class="r"><code>heart_df = subset(heart_df, select = c(-age))
+heart_df</code></pre>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["cp"],"name":[1],"type":["int"],"align":["right"]},{"label":["thalach"],"name":[2],"type":["int"],"align":["right"]},{"label":["exang"],"name":[3],"type":["int"],"align":["right"]},{"label":["oldpeak"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["slope"],"name":[5],"type":["int"],"align":["right"]},{"label":["ca"],"name":[6],"type":["int"],"align":["right"]},{"label":["thal"],"name":[7],"type":["int"],"align":["right"]},{"label":["target"],"name":[8],"type":["int"],"align":["right"]},{"label":["age_groups"],"name":[9],"type":["fct"],"align":["left"]}],"data":[{"1":"3","2":"150","3":"0","4":"2.3","5":"0","6":"0","7":"1","8":"1","9":"2","_rn_":"1"},{"1":"2","2":"187","3":"0","4":"3.5","5":"0","6":"0","7":"2","8":"1","9":"0","_rn_":"2"},{"1":"1","2":"172","3":"0","4":"1.4","5":"2","6":"0","7":"2","8":"1","9":"0","_rn_":"3"},{"1":"1","2":"178","3":"0","4":"0.8","5":"2","6":"0","7":"2","8":"1","9":"2","_rn_":"4"},{"1":"0","2":"163","3":"1","4":"0.6","5":"2","6":"0","7":"2","8":"1","9":"2","_rn_":"5"},{"1":"0","2":"148","3":"0","4":"0.4","5":"1","6":"0","7":"1","8":"1","9":"2","_rn_":"6"},{"1":"1","2":"153","3":"0","4":"1.3","5":"1","6":"0","7":"2","8":"1","9":"2","_rn_":"7"},{"1":"1","2":"173","3":"0","4":"0.0","5":"2","6":"0","7":"3","8":"1","9":"0","_rn_":"8"},{"1":"2","2":"162","3":"0","4":"0.5","5":"2","6":"0","7":"3","8":"1","9":"1","_rn_":"9"},{"1":"2","2":"174","3":"0","4":"1.6","5":"2","6":"0","7":"2","8":"1","9":"2","_rn_":"10"},{"1":"0","2":"160","3":"0","4":"1.2","5":"2","6":"0","7":"2","8":"1","9":"1","_rn_":"11"},{"1":"2","2":"139","3":"0","4":"0.2","5":"2","6":"0","7":"2","8":"1","9":"1","_rn_":"12"},{"1":"1","2":"171","3":"0","4":"0.6","5":"2","6":"0","7":"2","8":"1","9":"1","_rn_":"13"},{"1":"3","2":"144","3":"1","4":"1.8","5":"1","6":"0","7":"2","8":"1","9":"2","_rn_":"14"},{"1":"3","2":"162","3":"0","4":"1.0","5":"2","6":"0","7":"2","8":"1","9":"2","_rn_":"15"},{"1":"2","2":"158","3":"0","4":"1.6","5":"1","6":"0","7":"2","8":"1","9":"1","_rn_":"16"},{"1":"2","2":"172","3":"0","4":"0.0","5":"2","6":"0","7":"2","8":"1","9":"2","_rn_":"17"},{"1":"3","2":"114","3":"0","4":"2.6","5":"0","6":"0","7":"2","8":"1","9":"2","_rn_":"18"},{"1":"0","2":"171","3":"0","4":"1.5","5":"2","6":"0","7":"2","8":"1","9":"0","_rn_":"19"},{"1":"3","2":"151","3":"0","4":"1.8","5":"2","6":"2","7":"2","8":"1","9":"2","_rn_":"20"},{"1":"0","2":"161","3":"0","4":"0.5","5":"1","6":"0","7":"3","8":"1","9":"2","_rn_":"21"},{"1":"2","2":"179","3":"1","4":"0.4","5":"2","6":"0","7":"2","8":"1","9":"0","_rn_":"22"},{"1":"0","2":"178","3":"0","4":"0.0","5":"2","6":"0","7":"2","8":"1","9":"0","_rn_":"23"},{"1":"2","2":"137","3":"1","4":"1.0","5":"1","6":"0","7":"2","8":"1","9":"2","_rn_":"24"},{"1":"3","2":"178","3":"1","4":"1.4","5":"2","6":"0","7":"3","8":"1","9":"0","_rn_":"25"},{"1":"1","2":"162","3":"0","4":"0.4","5":"2","6":"2","7":"2","8":"1","9":"2","_rn_":"26"},{"1":"2","2":"157","3":"0","4":"1.6","5":"2","6":"0","7":"2","8":"1","9":"2","_rn_":"27"},{"1":"2","2":"123","3":"0","4":"0.6","5":"2","6":"0","7":"2","8":"1","9":"1","_rn_":"28"},{"1":"2","2":"157","3":"0","4":"0.8","5":"2","6":"1","7":"2","8":"1","9":"2","_rn_":"29"},{"1":"2","2":"152","3":"0","4":"1.2","5":"0","6":"0","7":"2","8":"1","9":"1","_rn_":"30"},{"1":"1","2":"168","3":"0","4":"0.0","5":"2","6":"1","7":"2","8":"1","9":"0","_rn_":"31"},{"1":"0","2":"140","3":"0","4":"0.4","5":"2","6":"0","7":"3","8":"1","9":"2","_rn_":"32"},{"1":"1","2":"188","3":"0","4":"0.0","5":"2","6":"0","7":"2","8":"1","9":"0","_rn_":"33"},{"1":"2","2":"152","3":"0","4":"0.5","5":"0","6":"1","7":"2","8":"1","9":"1","_rn_":"34"},{"1":"3","2":"125","3":"1","4":"1.4","5":"2","6":"1","7":"2","8":"1","9":"1","_rn_":"35"},{"1":"2","2":"160","3":"1","4":"1.4","5":"0","6":"0","7":"2","8":"1","9":"1","_rn_":"36"},{"1":"2","2":"170","3":"0","4":"0.0","5":"2","6":"0","7":"2","8":"1","9":"1","_rn_":"37"},{"1":"2","2":"165","3":"0","4":"1.6","5":"2","6":"0","7":"3","8":"1","9":"1","_rn_":"38"},{"1":"2","2":"148","3":"0","4":"0.8","5":"2","6":"0","7":"2","8":"1","9":"2","_rn_":"39"},{"1":"2","2":"151","3":"0","4":"0.8","5":"2","6":"0","7":"2","8":"1","9":"2","_rn_":"40"},{"1":"2","2":"142","3":"0","4":"1.5","5":"2","6":"1","7":"2","8":"1","9":"1","_rn_":"41"},{"1":"1","2":"180","3":"0","4":"0.2","5":"1","6":"0","7":"2","8":"1","9":"1","_rn_":"42"},{"1":"0","2":"148","3":"1","4":"3.0","5":"1","6":"0","7":"2","8":"1","9":"1","_rn_":"43"},{"1":"0","2":"143","3":"0","4":"0.4","5":"1","6":"0","7":"2","8":"1","9":"1","_rn_":"44"},{"1":"2","2":"182","3":"0","4":"0.0","5":"2","6":"0","7":"2","8":"1","9":"0","_rn_":"45"},{"1":"1","2":"172","3":"0","4":"0.2","5":"2","6":"0","7":"2","8":"1","9":"1","_rn_":"46"},{"1":"2","2":"180","3":"0","4":"0.0","5":"2","6":"0","7":"2","8":"1","9":"0","_rn_":"47"},{"1":"2","2":"156","3":"0","4":"0.0","5":"2","6":"0","7":"2","8":"1","9":"1","_rn_":"48"},{"1":"2","2":"115","3":"0","4":"0.0","5":"2","6":"0","7":"0","8":"1","9":"1","_rn_":"49"},{"1":"0","2":"160","3":"0","4":"0.0","5":"2","6":"0","7":"2","8":"1","9":"1","_rn_":"50"},{"1":"2","2":"149","3":"0","4":"0.5","5":"2","6":"0","7":"2","8":"1","9":"1","_rn_":"51"},{"1":"0","2":"151","3":"0","4":"0.4","5":"1","6":"0","7":"2","8":"1","9":"2","_rn_":"52"},{"1":"2","2":"146","3":"0","4":"1.8","5":"1","6":"3","7":"3","8":"1","9":"2","_rn_":"53"},{"1":"2","2":"175","3":"0","4":"0.6","5":"1","6":"0","7":"2","8":"1","9":"0","_rn_":"54"},{"1":"2","2":"172","3":"0","4":"0.0","5":"2","6":"0","7":"2","8":"1","9":"2","_rn_":"55"},{"1":"1","2":"158","3":"0","4":"0.8","5":"2","6":"1","7":"2","8":"1","9":"1","_rn_":"56"},{"1":"0","2":"186","3":"0","4":"0.0","5":"2","6":"0","7":"2","8":"1","9":"1","_rn_":"57"},{"1":"0","2":"185","3":"0","4":"0.0","5":"2","6":"0","7":"2","8":"1","9":"1","_rn_":"58"},{"1":"3","2":"174","3":"0","4":"0.0","5":"2","6":"0","7":"2","8":"1","9":"0","_rn_":"59"},{"1":"0","2":"159","3":"0","4":"0.0","5":"2","6":"1","7":"2","8":"1","9":"2","_rn_":"60"},{"1":"2","2":"130","3":"0","4":"0.0","5":"2","6":"1","7":"2","8":"1","9":"2","_rn_":"61"},{"1":"1","2":"156","3":"0","4":"0.0","5":"2","6":"0","7":"3","8":"1","9":"1","_rn_":"62"},{"1":"3","2":"190","3":"0","4":"0.0","5":"1","6":"0","7":"1","8":"1","9":"1","_rn_":"63"},{"1":"1","2":"132","3":"0","4":"0.0","5":"1","6":"0","7":"1","8":"1","9":"0","_rn_":"64"},{"1":"2","2":"165","3":"0","4":"0.0","5":"2","6":"0","7":"2","8":"1","9":"2","_rn_":"65"},{"1":"0","2":"182","3":"0","4":"1.4","5":"2","6":"0","7":"2","8":"1","9":"0","_rn_":"66"},{"1":"2","2":"143","3":"1","4":"1.2","5":"1","6":"0","7":"2","8":"1","9":"1","_rn_":"67"},{"1":"1","2":"175","3":"0","4":"0.6","5":"1","6":"0","7":"2","8":"1","9":"1","_rn_":"68"},{"1":"1","2":"170","3":"0","4":"0.0","5":"2","6":"0","7":"2","8":"1","9":"0","_rn_":"69"},{"1":"0","2":"163","3":"0","4":"0.0","5":"2","6":"0","7":"2","8":"1","9":"2","_rn_":"70"},{"1":"2","2":"147","3":"0","4":"0.4","5":"1","6":"0","7":"3","8":"1","9":"1","_rn_":"71"},{"1":"2","2":"154","3":"1","4":"0.0","5":"2","6":"1","7":"3","8":"1","9":"1","_rn_":"72"},{"1":"1","2":"202","3":"0","4":"0.0","5":"2","6":"0","7":"2","8":"1","9":"0","_rn_":"73"},{"1":"0","2":"186","3":"1","4":"0.0","5":"2","6":"0","7":"2","8":"1","9":"1","_rn_":"74"},{"1":"2","2":"165","3":"0","4":"0.2","5":"1","6":"0","7":"2","8":"1","9":"0","_rn_":"75"},{"1":"1","2":"161","3":"0","4":"1.4","5":"1","6":"0","7":"2","8":"1","9":"2","_rn_":"76"},{"1":"2","2":"166","3":"0","4":"2.4","5":"1","6":"0","7":"2","8":"1","9":"1","_rn_":"77"},{"1":"1","2":"164","3":"1","4":"0.0","5":"2","6":"0","7":"2","8":"1","9":"2","_rn_":"78"},{"1":"1","2":"184","3":"0","4":"0.0","5":"2","6":"0","7":"2","8":"1","9":"1","_rn_":"79"},{"1":"2","2":"154","3":"1","4":"0.6","5":"1","6":"0","7":"3","8":"1","9":"2","_rn_":"80"},{"1":"2","2":"179","3":"0","4":"0.0","5":"2","6":"0","7":"2","8":"1","9":"0","_rn_":"81"},{"1":"1","2":"170","3":"0","4":"0.0","5":"2","6":"0","7":"2","8":"1","9":"1","_rn_":"82"},{"1":"2","2":"160","3":"0","4":"0.0","5":"2","6":"1","7":"2","8":"1","9":"2","_rn_":"83"},{"1":"3","2":"178","3":"0","4":"1.2","5":"1","6":"0","7":"3","8":"1","9":"1","_rn_":"84"},{"1":"0","2":"122","3":"0","4":"0.6","5":"1","6":"0","7":"2","8":"1","9":"0","_rn_":"85"},{"1":"2","2":"160","3":"0","4":"1.6","5":"1","6":"0","7":"3","8":"1","9":"2","_rn_":"86"},{"1":"2","2":"151","3":"0","4":"1.0","5":"2","6":"1","7":"3","8":"1","9":"2","_rn_":"87"},{"1":"1","2":"156","3":"0","4":"0.0","5":"2","6":"0","7":"3","8":"1","9":"1","_rn_":"88"},{"1":"2","2":"158","3":"0","4":"1.6","5":"1","6":"0","7":"2","8":"1","9":"1","_rn_":"89"},{"1":"0","2":"122","3":"0","4":"1.0","5":"1","6":"0","7":"2","8":"1","9":"2","_rn_":"90"},{"1":"2","2":"175","3":"0","4":"0.0","5":"2","6":"2","7":"2","8":"1","9":"1","_rn_":"91"},{"1":"0","2":"168","3":"1","4":"0.0","5":"2","6":"0","7":"3","8":"1","9":"2","_rn_":"92"},{"1":"2","2":"169","3":"0","4":"0.0","5":"2","6":"4","7":"2","8":"1","9":"1","_rn_":"93"},{"1":"1","2":"159","3":"1","4":"0.0","5":"2","6":"1","7":"2","8":"1","9":"1","_rn_":"94"},{"1":"1","2":"138","3":"0","4":"0.0","5":"1","6":"0","7":"2","8":"1","9":"1","_rn_":"95"},{"1":"0","2":"111","3":"1","4":"0.0","5":"2","6":"0","7":"3","8":"1","9":"1","_rn_":"96"},{"1":"0","2":"157","3":"0","4":"1.2","5":"1","6":"0","7":"2","8":"1","9":"2","_rn_":"97"},{"1":"0","2":"147","3":"0","4":"0.1","5":"2","6":"3","7":"3","8":"1","9":"1","_rn_":"98"},{"1":"2","2":"162","3":"0","4":"1.9","5":"2","6":"1","7":"2","8":"1","9":"0","_rn_":"99"},{"1":"2","2":"173","3":"0","4":"0.0","5":"2","6":"3","7":"2","8":"1","9":"1","_rn_":"100"},{"1":"3","2":"178","3":"0","4":"0.8","5":"2","6":"2","7":"2","8":"1","9":"0","_rn_":"101"},{"1":"3","2":"145","3":"0","4":"4.2","5":"0","6":"0","7":"3","8":"1","9":"2","_rn_":"102"},{"1":"1","2":"179","3":"0","4":"0.0","5":"2","6":"2","7":"2","8":"1","9":"2","_rn_":"103"},{"1":"2","2":"194","3":"0","4":"0.8","5":"0","6":"0","7":"3","8":"1","9":"0","_rn_":"104"},{"1":"2","2":"163","3":"0","4":"0.0","5":"2","6":"0","7":"2","8":"1","9":"1","_rn_":"105"},{"1":"2","2":"115","3":"0","4":"1.5","5":"1","6":"0","7":"2","8":"1","9":"2","_rn_":"106"},{"1":"3","2":"131","3":"0","4":"0.1","5":"1","6":"1","7":"2","8":"1","9":"2","_rn_":"107"},{"1":"0","2":"152","3":"1","4":"0.2","5":"1","6":"0","7":"2","8":"1","9":"1","_rn_":"108"},{"1":"1","2":"162","3":"0","4":"1.1","5":"2","6":"0","7":"2","8":"1","9":"1","_rn_":"109"},{"1":"0","2":"159","3":"0","4":"0.0","5":"2","6":"0","7":"2","8":"1","9":"1","_rn_":"110"},{"1":"0","2":"154","3":"1","4":"0.0","5":"2","6":"0","7":"2","8":"1","9":"2","_rn_":"111"},{"1":"2","2":"173","3":"0","4":"0.2","5":"2","6":"1","7":"3","8":"1","9":"2","_rn_":"112"},{"1":"2","2":"133","3":"0","4":"0.2","5":"2","6":"0","7":"3","8":"1","9":"2","_rn_":"113"},{"1":"0","2":"161","3":"0","4":"0.0","5":"2","6":"0","7":"3","8":"1","9":"0","_rn_":"114"},{"1":"1","2":"155","3":"0","4":"0.0","5":"2","6":"0","7":"2","8":"1","9":"2","_rn_":"115"},{"1":"2","2":"170","3":"0","4":"0.0","5":"2","6":"0","7":"2","8":"1","9":"0","_rn_":"116"},{"1":"2","2":"168","3":"0","4":"2.0","5":"1","6":"0","7":"2","8":"1","9":"0","_rn_":"117"},{"1":"3","2":"162","3":"0","4":"1.9","5":"1","6":"0","7":"3","8":"1","9":"2","_rn_":"118"},{"1":"1","2":"172","3":"0","4":"0.0","5":"2","6":"0","7":"2","8":"1","9":"1","_rn_":"119"},{"1":"0","2":"152","3":"1","4":"0.0","5":"1","6":"0","7":"2","8":"1","9":"1","_rn_":"120"},{"1":"0","2":"122","3":"0","4":"2.0","5":"1","6":"2","7":"2","8":"1","9":"2","_rn_":"121"},{"1":"0","2":"182","3":"0","4":"0.0","5":"2","6":"0","7":"2","8":"1","9":"2","_rn_":"122"},{"1":"2","2":"172","3":"1","4":"0.0","5":"2","6":"0","7":"2","8":"1","9":"0","_rn_":"123"},{"1":"2","2":"167","3":"0","4":"0.0","5":"2","6":"0","7":"2","8":"1","9":"1","_rn_":"124"},{"1":"2","2":"179","3":"0","4":"0.0","5":"2","6":"0","7":"2","8":"1","9":"0","_rn_":"125"},{"1":"1","2":"192","3":"0","4":"0.7","5":"2","6":"0","7":"2","8":"1","9":"0","_rn_":"126"},{"1":"0","2":"143","3":"0","4":"0.1","5":"2","6":"0","7":"2","8":"1","9":"1","_rn_":"127"},{"1":"2","2":"172","3":"0","4":"0.0","5":"2","6":"1","7":"2","8":"1","9":"2","_rn_":"128"},{"1":"2","2":"169","3":"0","4":"0.1","5":"1","6":"0","7":"2","8":"1","9":"1","_rn_":"129"},{"1":"1","2":"121","3":"1","4":"0.2","5":"2","6":"1","7":"2","8":"1","9":"2","_rn_":"130"},{"1":"2","2":"163","3":"0","4":"0.0","5":"2","6":"1","7":"2","8":"1","9":"1","_rn_":"131"},{"1":"1","2":"162","3":"0","4":"0.0","5":"1","6":"0","7":"2","8":"1","9":"1","_rn_":"132"},{"1":"1","2":"162","3":"0","4":"0.0","5":"2","6":"0","7":"2","8":"1","9":"0","_rn_":"133"},{"1":"1","2":"153","3":"0","4":"0.0","5":"2","6":"0","7":"2","8":"1","9":"0","_rn_":"134"},{"1":"1","2":"163","3":"0","4":"0.0","5":"2","6":"0","7":"2","8":"1","9":"0","_rn_":"135"},{"1":"0","2":"163","3":"0","4":"0.0","5":"2","6":"0","7":"2","8":"1","9":"1","_rn_":"136"},{"1":"2","2":"96","3":"0","4":"0.0","5":"2","6":"0","7":"2","8":"1","9":"2","_rn_":"137"},{"1":"1","2":"140","3":"0","4":"0.0","5":"2","6":"0","7":"2","8":"1","9":"2","_rn_":"138"},{"1":"0","2":"126","3":"1","4":"1.5","5":"1","6":"0","7":"1","8":"1","9":"2","_rn_":"139"},{"1":"0","2":"105","3":"1","4":"0.2","5":"1","6":"1","7":"3","8":"1","9":"2","_rn_":"140"},{"1":"2","2":"157","3":"0","4":"0.6","5":"2","6":"0","7":"2","8":"1","9":"1","_rn_":"141"},{"1":"0","2":"181","3":"0","4":"1.2","5":"1","6":"0","7":"2","8":"1","9":"0","_rn_":"142"},{"1":"2","2":"173","3":"0","4":"0.0","5":"1","6":"0","7":"2","8":"1","9":"0","_rn_":"143"},{"1":"0","2":"142","3":"0","4":"0.3","5":"2","6":"2","7":"2","8":"1","9":"2","_rn_":"144"},{"1":"2","2":"116","3":"0","4":"1.1","5":"1","6":"0","7":"2","8":"1","9":"2","_rn_":"145"},{"1":"1","2":"143","3":"0","4":"0.0","5":"2","6":"0","7":"2","8":"1","9":"2","_rn_":"146"},{"1":"2","2":"149","3":"0","4":"0.3","5":"1","6":"1","7":"2","8":"1","9":"0","_rn_":"147"},{"1":"3","2":"171","3":"0","4":"0.9","5":"2","6":"0","7":"2","8":"1","9":"2","_rn_":"148"},{"1":"2","2":"169","3":"0","4":"0.0","5":"2","6":"0","7":"2","8":"1","9":"0","_rn_":"149"},{"1":"2","2":"150","3":"0","4":"0.0","5":"2","6":"0","7":"2","8":"1","9":"0","_rn_":"150"},{"1":"0","2":"138","3":"0","4":"2.3","5":"2","6":"0","7":"1","8":"1","9":"2","_rn_":"151"},{"1":"0","2":"125","3":"0","4":"1.6","5":"1","6":"0","7":"2","8":"1","9":"2","_rn_":"152"},{"1":"3","2":"155","3":"0","4":"0.6","5":"1","6":"0","7":"3","8":"1","9":"2","_rn_":"153"},{"1":"2","2":"152","3":"0","4":"0.0","5":"1","6":"1","7":"2","8":"1","9":"2","_rn_":"154"},{"1":"2","2":"152","3":"0","4":"0.0","5":"1","6":"0","7":"2","8":"1","9":"0","_rn_":"155"},{"1":"0","2":"131","3":"0","4":"0.6","5":"1","6":"0","7":"2","8":"1","9":"2","_rn_":"156"},{"1":"2","2":"179","3":"0","4":"0.0","5":"2","6":"0","7":"2","8":"1","9":"1","_rn_":"157"},{"1":"1","2":"174","3":"0","4":"0.0","5":"2","6":"0","7":"2","8":"1","9":"0","_rn_":"158"},{"1":"1","2":"144","3":"0","4":"0.4","5":"1","6":"4","7":"3","8":"1","9":"2","_rn_":"159"},{"1":"1","2":"163","3":"0","4":"0.0","5":"2","6":"0","7":"3","8":"1","9":"2","_rn_":"160"},{"1":"1","2":"169","3":"0","4":"0.0","5":"0","6":"0","7":"2","8":"1","9":"2","_rn_":"161"},{"1":"1","2":"166","3":"0","4":"1.2","5":"2","6":"0","7":"2","8":"1","9":"2","_rn_":"162"},{"1":"1","2":"182","3":"0","4":"0.0","5":"2","6":"0","7":"2","8":"1","9":"0","_rn_":"163"},{"1":"2","2":"173","3":"0","4":"0.0","5":"2","6":"4","7":"2","8":"1","9":"0","_rn_":"164"},{"1":"2","2":"173","3":"0","4":"0.0","5":"2","6":"4","7":"2","8":"1","9":"0","_rn_":"165"},{"1":"0","2":"108","3":"1","4":"1.5","5":"1","6":"3","7":"2","8":"0","9":"2","_rn_":"166"},{"1":"0","2":"129","3":"1","4":"2.6","5":"1","6":"2","7":"3","8":"0","9":"2","_rn_":"167"},{"1":"0","2":"160","3":"0","4":"3.6","5":"0","6":"2","7":"2","8":"0","9":"2","_rn_":"168"},{"1":"0","2":"147","3":"0","4":"1.4","5":"1","6":"1","7":"3","8":"0","9":"2","_rn_":"169"},{"1":"0","2":"155","3":"1","4":"3.1","5":"0","6":"0","7":"3","8":"0","9":"1","_rn_":"170"},{"1":"2","2":"142","3":"1","4":"0.6","5":"1","6":"1","7":"1","8":"0","9":"2","_rn_":"171"},{"1":"1","2":"168","3":"0","4":"1.0","5":"0","6":"0","7":"3","8":"0","9":"1","_rn_":"172"},{"1":"1","2":"160","3":"0","4":"1.8","5":"1","6":"0","7":"2","8":"0","9":"2","_rn_":"173"},{"1":"2","2":"173","3":"0","4":"3.2","5":"2","6":"2","7":"3","8":"0","9":"2","_rn_":"174"},{"1":"0","2":"132","3":"1","4":"2.4","5":"1","6":"2","7":"3","8":"0","9":"2","_rn_":"175"},{"1":"0","2":"114","3":"1","4":"2.0","5":"1","6":"0","7":"3","8":"0","9":"0","_rn_":"176"},{"1":"0","2":"160","3":"1","4":"1.4","5":"2","6":"2","7":"3","8":"0","9":"2","_rn_":"177"},{"1":"2","2":"158","3":"0","4":"0.0","5":"2","6":"0","7":"2","8":"0","9":"2","_rn_":"178"},{"1":"0","2":"120","3":"1","4":"2.5","5":"1","6":"0","7":"3","8":"0","9":"0","_rn_":"179"},{"1":"0","2":"112","3":"1","4":"0.6","5":"1","6":"1","7":"1","8":"0","9":"2","_rn_":"180"},{"1":"0","2":"132","3":"1","4":"1.2","5":"1","6":"1","7":"3","8":"0","9":"2","_rn_":"181"},{"1":"0","2":"114","3":"0","4":"1.0","5":"1","6":"3","7":"3","8":"0","9":"2","_rn_":"182"},{"1":"0","2":"169","3":"0","4":"0.0","5":"2","6":"0","7":"2","8":"0","9":"2","_rn_":"183"},{"1":"2","2":"165","3":"0","4":"2.5","5":"1","6":"1","7":"3","8":"0","9":"2","_rn_":"184"},{"1":"0","2":"128","3":"0","4":"2.6","5":"1","6":"0","7":"3","8":"0","9":"1","_rn_":"185"},{"1":"0","2":"153","3":"0","4":"0.0","5":"2","6":"1","7":"2","8":"0","9":"0","_rn_":"186"},{"1":"0","2":"144","3":"1","4":"1.4","5":"2","6":"1","7":"3","8":"0","9":"2","_rn_":"187"},{"1":"0","2":"109","3":"1","4":"2.2","5":"1","6":"1","7":"3","8":"0","9":"1","_rn_":"188"},{"1":"2","2":"163","3":"0","4":"0.6","5":"1","6":"1","7":"3","8":"0","9":"1","_rn_":"189"},{"1":"0","2":"158","3":"0","4":"0.0","5":"2","6":"0","7":"3","8":"0","9":"0","_rn_":"190"},{"1":"0","2":"142","3":"1","4":"1.2","5":"1","6":"0","7":"3","8":"0","9":"1","_rn_":"191"},{"1":"0","2":"131","3":"1","4":"2.2","5":"1","6":"3","7":"3","8":"0","9":"2","_rn_":"192"},{"1":"0","2":"113","3":"0","4":"1.4","5":"1","6":"1","7":"3","8":"0","9":"1","_rn_":"193"},{"1":"0","2":"142","3":"1","4":"2.8","5":"1","6":"2","7":"3","8":"0","9":"2","_rn_":"194"},{"1":"2","2":"155","3":"0","4":"3.0","5":"1","6":"0","7":"2","8":"0","9":"2","_rn_":"195"},{"1":"0","2":"140","3":"1","4":"3.4","5":"0","6":"0","7":"3","8":"0","9":"2","_rn_":"196"},{"1":"2","2":"147","3":"0","4":"3.6","5":"1","6":"0","7":"2","8":"0","9":"1","_rn_":"197"},{"1":"0","2":"163","3":"0","4":"0.2","5":"1","6":"2","7":"3","8":"0","9":"2","_rn_":"198"},{"1":"0","2":"99","3":"1","4":"1.8","5":"1","6":"2","7":"3","8":"0","9":"2","_rn_":"199"},{"1":"0","2":"158","3":"0","4":"0.6","5":"2","6":"2","7":"1","8":"0","9":"2","_rn_":"200"},{"1":"0","2":"177","3":"0","4":"0.0","5":"2","6":"1","7":"2","8":"0","9":"0","_rn_":"201"},{"1":"0","2":"141","3":"1","4":"2.8","5":"1","6":"1","7":"3","8":"0","9":"2","_rn_":"202"},{"1":"0","2":"111","3":"1","4":"0.8","5":"2","6":"0","7":"3","8":"0","9":"2","_rn_":"203"},{"1":"2","2":"150","3":"1","4":"1.6","5":"1","6":"0","7":"3","8":"0","9":"2","_rn_":"204"},{"1":"0","2":"145","3":"0","4":"6.2","5":"0","6":"3","7":"3","8":"0","9":"2","_rn_":"205"},{"1":"0","2":"161","3":"1","4":"0.0","5":"2","6":"1","7":"3","8":"0","9":"1","_rn_":"206"},{"1":"0","2":"142","3":"1","4":"1.2","5":"1","6":"1","7":"3","8":"0","9":"2","_rn_":"207"},{"1":"0","2":"157","3":"0","4":"2.6","5":"1","6":"2","7":"3","8":"0","9":"2","_rn_":"208"},{"1":"2","2":"139","3":"0","4":"2.0","5":"1","6":"3","7":"3","8":"0","9":"1","_rn_":"209"},{"1":"0","2":"162","3":"1","4":"0.0","5":"2","6":"1","7":"3","8":"0","9":"2","_rn_":"210"},{"1":"2","2":"150","3":"0","4":"0.4","5":"1","6":"1","7":"3","8":"0","9":"2","_rn_":"211"},{"1":"0","2":"140","3":"1","4":"3.6","5":"1","6":"1","7":"3","8":"0","9":"2","_rn_":"212"},{"1":"0","2":"140","3":"0","4":"1.2","5":"1","6":"0","7":"3","8":"0","9":"0","_rn_":"213"},{"1":"0","2":"146","3":"1","4":"1.0","5":"1","6":"0","7":"3","8":"0","9":"2","_rn_":"214"},{"1":"0","2":"144","3":"1","4":"1.2","5":"1","6":"1","7":"2","8":"0","9":"2","_rn_":"215"},{"1":"0","2":"136","3":"1","4":"3.0","5":"1","6":"0","7":"3","8":"0","9":"0","_rn_":"216"},{"1":"2","2":"97","3":"0","4":"1.2","5":"1","6":"1","7":"3","8":"0","9":"2","_rn_":"217"},{"1":"0","2":"132","3":"1","4":"1.8","5":"2","6":"3","7":"3","8":"0","9":"2","_rn_":"218"},{"1":"0","2":"127","3":"0","4":"2.8","5":"1","6":"1","7":"3","8":"0","9":"2","_rn_":"219"},{"1":"0","2":"150","3":"1","4":"0.0","5":"2","6":"2","7":"3","8":"0","9":"1","_rn_":"220"},{"1":"0","2":"154","3":"0","4":"4.0","5":"1","6":"3","7":"3","8":"0","9":"2","_rn_":"221"},{"1":"0","2":"111","3":"1","4":"5.6","5":"0","6":"0","7":"3","8":"0","9":"2","_rn_":"222"},{"1":"3","2":"174","3":"0","4":"1.4","5":"1","6":"1","7":"2","8":"0","9":"2","_rn_":"223"},{"1":"0","2":"133","3":"1","4":"4.0","5":"0","6":"2","7":"3","8":"0","9":"2","_rn_":"224"},{"1":"0","2":"126","3":"1","4":"2.8","5":"1","6":"1","7":"3","8":"0","9":"1","_rn_":"225"},{"1":"0","2":"125","3":"1","4":"2.6","5":"0","6":"0","7":"3","8":"0","9":"2","_rn_":"226"},{"1":"1","2":"103","3":"0","4":"1.4","5":"1","6":"1","7":"3","8":"0","9":"2","_rn_":"227"},{"1":"0","2":"130","3":"1","4":"1.6","5":"1","6":"0","7":"3","8":"0","9":"0","_rn_":"228"},{"1":"3","2":"159","3":"0","4":"0.2","5":"1","6":"0","7":"3","8":"0","9":"2","_rn_":"229"},{"1":"2","2":"131","3":"1","4":"1.8","5":"1","6":"0","7":"3","8":"0","9":"2","_rn_":"230"},{"1":"2","2":"152","3":"0","4":"0.0","5":"2","6":"0","7":"2","8":"0","9":"1","_rn_":"231"},{"1":"0","2":"124","3":"0","4":"1.0","5":"1","6":"3","7":"3","8":"0","9":"2","_rn_":"232"},{"1":"0","2":"145","3":"1","4":"0.8","5":"1","6":"1","7":"3","8":"0","9":"2","_rn_":"233"},{"1":"0","2":"96","3":"1","4":"2.2","5":"0","6":"1","7":"2","8":"0","9":"2","_rn_":"234"},{"1":"0","2":"109","3":"0","4":"2.4","5":"1","6":"3","7":"2","8":"0","9":"2","_rn_":"235"},{"1":"0","2":"173","3":"1","4":"1.6","5":"2","6":"0","7":"3","8":"0","9":"1","_rn_":"236"},{"1":"0","2":"171","3":"0","4":"0.0","5":"2","6":"2","7":"3","8":"0","9":"2","_rn_":"237"},{"1":"0","2":"170","3":"0","4":"1.2","5":"1","6":"2","7":"3","8":"0","9":"2","_rn_":"238"},{"1":"0","2":"162","3":"1","4":"0.0","5":"2","6":"3","7":"2","8":"0","9":"2","_rn_":"239"},{"1":"0","2":"156","3":"1","4":"0.0","5":"2","6":"0","7":"3","8":"0","9":"0","_rn_":"240"},{"1":"2","2":"112","3":"1","4":"2.9","5":"1","6":"1","7":"3","8":"0","9":"2","_rn_":"241"},{"1":"0","2":"143","3":"1","4":"0.0","5":"1","6":"0","7":"2","8":"0","9":"2","_rn_":"242"},{"1":"0","2":"132","3":"0","4":"2.0","5":"1","6":"2","7":"1","8":"0","9":"2","_rn_":"243"},{"1":"0","2":"88","3":"1","4":"1.2","5":"1","6":"1","7":"3","8":"0","9":"2","_rn_":"244"},{"1":"0","2":"105","3":"1","4":"2.1","5":"1","6":"1","7":"1","8":"0","9":"2","_rn_":"245"},{"1":"0","2":"166","3":"0","4":"0.5","5":"1","6":"0","7":"3","8":"0","9":"1","_rn_":"246"},{"1":"0","2":"150","3":"1","4":"1.9","5":"1","6":"2","7":"3","8":"0","9":"2","_rn_":"247"},{"1":"1","2":"120","3":"1","4":"0.0","5":"1","6":"3","7":"1","8":"0","9":"2","_rn_":"248"},{"1":"1","2":"195","3":"0","4":"0.0","5":"2","6":"1","7":"3","8":"0","9":"1","_rn_":"249"},{"1":"2","2":"146","3":"0","4":"2.0","5":"1","6":"3","7":"3","8":"0","9":"2","_rn_":"250"},{"1":"0","2":"122","3":"1","4":"4.2","5":"1","6":"3","7":"3","8":"0","9":"1","_rn_":"251"},{"1":"0","2":"143","3":"1","4":"0.1","5":"1","6":"4","7":"3","8":"0","9":"0","_rn_":"252"},{"1":"0","2":"106","3":"0","4":"1.9","5":"1","6":"3","7":"2","8":"0","9":"2","_rn_":"253"},{"1":"0","2":"125","3":"1","4":"0.9","5":"1","6":"2","7":"2","8":"0","9":"2","_rn_":"254"},{"1":"3","2":"125","3":"0","4":"0.0","5":"2","6":"0","7":"2","8":"0","9":"2","_rn_":"255"},{"1":"0","2":"147","3":"1","4":"0.0","5":"1","6":"3","7":"3","8":"0","9":"1","_rn_":"256"},{"1":"0","2":"130","3":"1","4":"3.0","5":"1","6":"2","7":"3","8":"0","9":"2","_rn_":"257"},{"1":"0","2":"126","3":"1","4":"0.9","5":"1","6":"0","7":"3","8":"0","9":"1","_rn_":"258"},{"1":"0","2":"154","3":"1","4":"1.4","5":"1","6":"0","7":"2","8":"0","9":"2","_rn_":"259"},{"1":"3","2":"182","3":"1","4":"3.8","5":"1","6":"0","7":"3","8":"0","9":"0","_rn_":"260"},{"1":"0","2":"165","3":"1","4":"1.0","5":"1","6":"2","7":"3","8":"0","9":"2","_rn_":"261"},{"1":"0","2":"160","3":"0","4":"0.0","5":"2","6":"1","7":"2","8":"0","9":"1","_rn_":"262"},{"1":"0","2":"95","3":"1","4":"2.0","5":"1","6":"2","7":"3","8":"0","9":"1","_rn_":"263"},{"1":"0","2":"169","3":"1","4":"1.8","5":"1","6":"2","7":"2","8":"0","9":"2","_rn_":"264"},{"1":"0","2":"108","3":"1","4":"0.0","5":"1","6":"1","7":"2","8":"0","9":"1","_rn_":"265"},{"1":"0","2":"132","3":"1","4":"0.1","5":"2","6":"1","7":"2","8":"0","9":"2","_rn_":"266"},{"1":"0","2":"117","3":"1","4":"3.4","5":"1","6":"0","7":"2","8":"0","9":"2","_rn_":"267"},{"1":"2","2":"126","3":"0","4":"0.8","5":"2","6":"3","7":"2","8":"0","9":"1","_rn_":"268"},{"1":"0","2":"116","3":"1","4":"3.2","5":"1","6":"2","7":"2","8":"0","9":"1","_rn_":"269"},{"1":"0","2":"103","3":"1","4":"1.6","5":"0","6":"0","7":"3","8":"0","9":"2","_rn_":"270"},{"1":"0","2":"144","3":"0","4":"0.8","5":"2","6":"0","7":"3","8":"0","9":"1","_rn_":"271"},{"1":"3","2":"145","3":"0","4":"2.6","5":"1","6":"2","7":"2","8":"0","9":"2","_rn_":"272"},{"1":"0","2":"71","3":"0","4":"1.0","5":"1","6":"0","7":"2","8":"0","9":"2","_rn_":"273"},{"1":"0","2":"156","3":"0","4":"0.1","5":"2","6":"1","7":"3","8":"0","9":"2","_rn_":"274"},{"1":"0","2":"118","3":"1","4":"1.0","5":"1","6":"1","7":"2","8":"0","9":"1","_rn_":"275"},{"1":"0","2":"168","3":"0","4":"1.0","5":"2","6":"2","7":"3","8":"0","9":"1","_rn_":"276"},{"1":"0","2":"105","3":"0","4":"2.0","5":"1","6":"1","7":"3","8":"0","9":"2","_rn_":"277"},{"1":"1","2":"141","3":"0","4":"0.3","5":"2","6":"0","7":"3","8":"0","9":"2","_rn_":"278"},{"1":"1","2":"152","3":"0","4":"0.0","5":"2","6":"2","7":"2","8":"0","9":"2","_rn_":"279"},{"1":"0","2":"125","3":"1","4":"3.6","5":"1","6":"1","7":"2","8":"0","9":"2","_rn_":"280"},{"1":"0","2":"125","3":"1","4":"1.8","5":"1","6":"0","7":"1","8":"0","9":"0","_rn_":"281"},{"1":"0","2":"156","3":"1","4":"1.0","5":"1","6":"0","7":"0","8":"0","9":"1","_rn_":"282"},{"1":"2","2":"134","3":"0","4":"2.2","5":"1","6":"1","7":"1","8":"0","9":"2","_rn_":"283"},{"1":"0","2":"181","3":"0","4":"0.0","5":"2","6":"0","7":"3","8":"0","9":"0","_rn_":"284"},{"1":"0","2":"138","3":"1","4":"1.9","5":"2","6":"1","7":"3","8":"0","9":"2","_rn_":"285"},{"1":"0","2":"120","3":"1","4":"1.8","5":"1","6":"2","7":"3","8":"0","9":"1","_rn_":"286"},{"1":"3","2":"162","3":"0","4":"0.8","5":"2","6":"2","7":"2","8":"0","9":"2","_rn_":"287"},{"1":"1","2":"164","3":"0","4":"0.0","5":"2","6":"1","7":"2","8":"0","9":"2","_rn_":"288"},{"1":"0","2":"143","3":"1","4":"3.0","5":"1","6":"1","7":"3","8":"0","9":"2","_rn_":"289"},{"1":"0","2":"130","3":"1","4":"2.0","5":"1","6":"1","7":"3","8":"0","9":"2","_rn_":"290"},{"1":"0","2":"161","3":"0","4":"0.0","5":"2","6":"1","7":"3","8":"0","9":"2","_rn_":"291"},{"1":"0","2":"140","3":"0","4":"4.4","5":"0","6":"3","7":"1","8":"0","9":"2","_rn_":"292"},{"1":"0","2":"146","3":"1","4":"2.8","5":"1","6":"2","7":"1","8":"0","9":"2","_rn_":"293"},{"1":"2","2":"150","3":"0","4":"0.8","5":"1","6":"0","7":"3","8":"0","9":"2","_rn_":"294"},{"1":"0","2":"144","3":"1","4":"2.8","5":"0","6":"0","7":"1","8":"0","9":"0","_rn_":"295"},{"1":"0","2":"144","3":"1","4":"4.0","5":"2","6":"2","7":"3","8":"0","9":"2","_rn_":"296"},{"1":"0","2":"136","3":"1","4":"0.0","5":"1","6":"0","7":"2","8":"0","9":"2","_rn_":"297"},{"1":"0","2":"90","3":"0","4":"1.0","5":"1","6":"2","7":"1","8":"0","9":"2","_rn_":"298"},{"1":"0","2":"123","3":"1","4":"0.2","5":"1","6":"0","7":"3","8":"0","9":"2","_rn_":"299"},{"1":"3","2":"132","3":"0","4":"1.2","5":"1","6":"0","7":"3","8":"0","9":"1","_rn_":"300"},{"1":"0","2":"141","3":"0","4":"3.4","5":"1","6":"2","7":"3","8":"0","9":"2","_rn_":"301"},{"1":"0","2":"115","3":"1","4":"1.2","5":"1","6":"1","7":"3","8":"0","9":"2","_rn_":"302"},{"1":"1","2":"174","3":"0","4":"0.0","5":"1","6":"1","7":"2","8":"0","9":"2","_rn_":"303"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+<div id="create-traintest-split" class="section level2">
+<h2>Create train/test split</h2>
+<pre class="r"><code>set.seed(2031)
+require(caTools)</code></pre>
+<pre><code>## Loading required package: caTools</code></pre>
+<pre class="r"><code>split = sample.split(heart_df$target, SplitRatio = 0.75)
+train = subset(heart_df, split==TRUE)
+test = subset(heart_df, split==FALSE)</code></pre>
+</div>
+<div id="create-and-train-a-simple-decision-tree" class="section level2">
+<h2>Create and train a simple decision tree</h2>
+<pre class="r"><code>tree = rpart(target~., data=train, method=&#39;class&#39;)
+prp(tree)</code></pre>
+<p><img src="Final_Project_files/figure-html/display_tree-1.png" width="672" /></p>
+</div>
+<div id="get-results-of-tree-on-testing-data" class="section level2">
+<h2>Get results of tree on testing data</h2>
+<pre class="r"><code>predictTree = predict(tree, newdata=test, type=&#39;class&#39;)
+table(test$target, predictTree)</code></pre>
+<pre><code>##    predictTree
+##      0  1
+##   0 22 12
+##   1  3 38</code></pre>
+<pre class="r"><code>(22 + 38)/nrow(test)</code></pre>
+<pre><code>## [1] 0.8</code></pre>
+<p>The model is telling us that the features that chest pain,the number of major vessels, and the maximum heart rate achieved impacts the decision the most when making a decision on whether or not the patient has a heart disease. But sadly we only got a 80% on this model for our testing data, this isn’t terrible but it doesn’t truly capture the full understanding that we would like to see to make a more significant claim. However, this does personally tell me that my own individual chest pain is nothing to scoff as it might truly relate to a more underlying issue.</p>
+</div>
+<div id="reflection-data" class="section level2">
+<h2>Reflection data</h2>
+<p>Luckily my data was very clean and I was not missing anything in any of my features, thus I had to do no data cleaning for my dataset. When looking at my data flow pipeline I was constantly thinking about what features may or may not make the most sense and impact in determining heart disease. Originally I thought gender and blood pressure would be impactful, but my dataset shows that these features do not make as much of an impact as I once thought. Looking at my decision tree tells us that the features of chest pain, number of major vessels, and the maximum heart rate achieved impacts the decision the most when making a determination on whether or not the patient has heart disease. But sadly we only got an 80% on this model for our testing data. This in itself is not terrible but it does not truly capture the full understanding that we would like to see to make a more significant claim. However, this does personally tell me that my own individual chest pain is nothing to scoff at as it might truly relate to a more underlying issue. If I were to start this project over again I would like to find a bigger dataset than only 300 patients. The most time consuming part of this project was not necessarily the data itself but mainly learning how to program in R and likewise how to work with R studio. I was very confused about how to manage R sessions and thought there was an environment I had to point to for individual projects, but as it turns out each R session has zero packages and you install them into your own session from the code. My own concept of Python environments posed some problems and made me spend more time than needed. I also spent a few hours trying to get R to work in Jupyter Notebooks because of my familiarity with notebooks, but I kept getting strange errors that were crashing any R notebook I would try to spin up. To continue with, R markdown for notebooks took a few tries to properly run due to Knit complaining about cran repositories and lines of code needing to be encapsulated in uniquely defined markdown titles. However, the overall hardest part was simply learning and getting used to the general feel of the syntax. I had a difficult time getting used to the concept of piping and plotting differently as well as learning how to properly use the R markdown of Knit. I felt slowed down and hindered since I knew the same code in Python and constantly found myself typing code for Python by accident and wanting to call seaborn graphs. I hope to have more projects in the future in R to get more well versed in the syntax so it does not feel so foriegn to me and in turn I will add more to my own data scientist arsenal.</p>
+</div>
+<div id="conclusion" class="section level2">
+<h2>Conclusion</h2>
+<p>The purpose of this project was to find what features and likewise the values of those features seem to impact the determination of classifying heart disease the most. Looking at my statistical testing we do find that cholesterol actually is significant enough to consider it for further analysis and modeling which lines up with my general understanding of heart disease/problems. However, I was conflicted in removing the feature of resting blood pressure due to the fact my statistical test made it seem impactful. But when looking at the visualizations it did not appear that it would hold a significant impact. If given more time I would love to go back and experiment more with this feature. The model is telling us that the features of chest pain, the number of major vessels, and the maximum heart rate achieved impacts the decision the most when determining whether or not the patient has a heart disease. This makes sense as the number of major vessels changes the strain on the heart that could result in a disease as well as the maximum heart rate of the patient. With an 80% accuracy, there is still rom to grow. Moving forward, I feel as though more patient data would increase the complexity curve of the model making the given accuracy of 80% more impressive. The findings from this study are crucial for the medical experts who work with cardiac patients. The information allows doctors to use certain factors to determine a patient’s future with heart disease. The more clear understanding we have of warning signs, the likelihood of survival increase. Preventative measures can take place before the patient is in crisis. This study is worth exploring further to allow cardiac patients to have a better quality of life.</p>
+</div>
+</div>
+
+<!--radix_placeholder_site_after_body-->
+<!--/radix_placeholder_site_after_body-->
+<!--radix_placeholder_navigation_after_body-->
+<div class="distill-site-nav distill-site-footer">
+<!-- DACSS wordmark -->
+<div class="footer-center"><a href="https://www.umass.edu/sbs/dacss">
+  <img src="images/white-dacss-wordmark.png" 
+  alt="UMass Amherst DACSS" width ="30%" id="dacss-footer"/></a>
+</div>
+<!-- Social media icons -->
+<div class="container">
+  <div class="social-media-icons">
+    <a href="https://twitter.com/UMassDACSS" target="_blank" title="Twitter" class="footer fa fa-twitter"></a>
+    <a href="https://bit.ly/3cMIlIK" target="_blank" title="Facebook" class="footer fa fa-facebook"></a>
+    <a href="https://bit.ly/2PymwUp" target="_blank" title="LinkedIn" class="footer fa fa-linkedin"></a>
+    <a href="https://www.instagram.com/umassdacss/?hl=en" target="_blank" title="Instagram" class="footer fa fa-instagram"></a>
+    <a class="fa fa-placeholder"></a>
+  </div>
+</div>
+</div>
+<!--/radix_placeholder_navigation_after_body-->
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

@@ -4,8 +4,13 @@ output:
   html_document:
     df_print: paged
 ---
+
+## Introduction
   In this research project I want to understand what attributes of both the human body and attributes of the heart relate to heart diseases. My interest derives from the fact that I am currently under diagnosis for my own heart related disease and would like to become more versed in understanding what attributes that I myself should look into and moreover gain a better understanding of the terminology in the cardiology field. This will hopefully empower me to be more able to understand the terminology when discussing treatment options with my doctor as my diagnosis continues. I feel this understanding will help put myself more at ease as I go through this tough time and help me not feel overwhelmed by the overall jargon the doctors will be using when discussing any problems I may or may not have. 
   I am particularly going to look at the UCI Heart disease dataset because it correlates directly to real life patient data and is well structured data. In an attempt to see what attributes I should look at when trying to predict heart disease. I want to find out if heart disease is more related to attributes of the body such as age and gender or more so to attributes of the organ itself. As well as understand which features are more related to each other under the guise of heart disease. I am interested in mainly seeing how age, gender, blood pressure, resting electrocardiographic measurement seem to have a impact the overall chances of having a heart disease.
+
+## Background Dataset info
+The original dataset is from the UCI which is a repository for datasets for developing and working with machine learning algorithms. However, the original distributors of the datasets were University Hospital, Zurich, Switzerland: William Steinbrunn, M.D, University Hospital, Basel, Switzerland: Matthias Pfisterer, M.D, V.A.Medical Center, Long Beach and Cleveland Clinic Foundation: Robert Detrano,M.D., Ph.D. These are the following features of my dataset.
 
 ### Features of the data set
 *  age: The person’s age in years
@@ -40,6 +45,9 @@ install.packages("ggplot2",repos = "http://cran.us.r-project.org")
 install.packages("plyr",repos = "http://cran.us.r-project.org")
 install.packages("caTools",repos = "http://cran.us.r-project.org")
 install.packages("RColorBrewer",repos = "http://cran.us.r-project.org")
+install.packages("rpart",repos = "http://cran.us.r-project.org")
+install.packages("rpart.plot",repos = "http://cran.us.r-project.org")
+install.packages("naniar",repos = "http://cran.us.r-project.org")
 ```
 
 ```{r path_libs_to_env}
@@ -51,6 +59,9 @@ library(corrplot)
 library(ggcorrplot)
 library(ggplot2)
 library(RColorBrewer)
+library(rpart)
+library(rpart.plot)
+library(naniar)
 ```
 
 ## Import csv file of dataset
@@ -70,6 +81,47 @@ ncol(heart_df)
 str(heart_df)
 summary(heart_df)
 ```
+
+## Display any missing data
+```{r missing_data_graph}
+vis_miss(heart_df)
+```
+
+There is no missing data for this dataset so no cleaning will be needed. (Thank the data gods!)
+
+## Stat testing age between those with or without heart disease
+```{r t_test_age_target}
+t.test(heart_df$age ~ heart_df$target, mu = 0, alt = "two.sided", conf = 0.95, var.eq = FALSE, paired = FALSE)
+```
+
+The null hypothesis is: there is no difference in average age between those with or without heart disease.
+
+The p-value is near zero, thus we can reject our null hypothesis and with 95% confidence say there is a statistically significant difference between the average age of those who have heart disease vs those who do not.
+
+The confidence interval also does not include zero, therefore, it supports our rejection of the null.
+
+## Stat testing cholesterol between those with or without heart disease
+```{r t_test_cholesterol_target}
+t.test(heart_df$chol ~ heart_df$target, mu = 0, alt = "two.sided", conf = 0.95, var.eq = FALSE, paired = FALSE)
+```
+
+Our null hypothesis states: There is no difference between the average cholesterol levels of a patient with heart disease and of a patient without heart disease.
+
+Our p-value shows that the probability of getting our results/extremes, assuming the null hypothesis is true, will happen 13.6% of the time. Therefore, we cannot reject our null hypothesis.
+
+Also since the 95% confidence interval includes zero, it supports our failure to reject the null hypothesis.
+
+## Stat testing  blood pressure between those with or without heart disease
+```{r t_test_blood_pressure_target}
+t.test(heart_df$trestbps ~ heart_df$target, mu = 0, alt = "two.sided", conf = 0.95, var.eq = FALSE, paired = FALSE)
+```
+
+The null hypothesis is: there is no difference in average blood pressure between those with or without heart disease.
+
+The p-value is 1.3% which is less than 5%, therefore we can reject our null hypothesis and with 95% confidence say there is a statistically significant difference between the average blood pressure of those who have heart disease vs those who do not.
+
+The confidence interval also does not include zero, therefore, it supports our rejection of the null.s
+
 
 ## Displaying the coralation matrix
 ```{r corr_df}
@@ -201,4 +253,39 @@ heart_df
 ```
 
 
-  
+## Create train/test split
+```{r create_train_test_split}
+set.seed(2031)
+require(caTools)
+split = sample.split(heart_df$target, SplitRatio = 0.75)
+train = subset(heart_df, split==TRUE)
+test = subset(heart_df, split==FALSE)
+```
+
+## Create and train a simple decision tree
+```{r display_tree}
+tree = rpart(target~., data=train, method='class')
+prp(tree)
+```
+
+## Get results of tree on testing data
+```{r tree_test_results}
+predictTree = predict(tree, newdata=test, type='class')
+table(test$target, predictTree)
+(22 + 38)/nrow(test)
+```
+
+The model is telling us that the features that chest pain,the number of major vessels, and the maximum heart rate achieved impacts the decision the most when making a decision on whether or not the patient has a heart disease. But sadly we only got a 80% on this model for our testing data, this isn’t terrible but it doesn’t truly capture the full understanding that we would like to see to make a more significant claim. However, this does personally tell me that my own individual chest pain is nothing to scoff as it might truly relate to a more underlying issue.
+
+
+## Reflection data
+Luckily my data was very clean and I was not missing anything in any of my features, thus I had to do no data cleaning for my dataset. When looking at my data flow pipeline I was constantly thinking about what features may or may not make the most sense and impact in determining heart disease. Originally I thought gender and blood pressure would be impactful, but my dataset shows that these features do not make as much of an impact as I once thought. Looking at my decision tree tells us that the features of chest pain,  number of major vessels, and the maximum heart rate achieved impacts the decision the most when making a determination on whether or not the patient has heart disease. But sadly we only got an 80% on this model for our testing data. This in itself is not terrible but it does not truly capture the full understanding that we would like to see to make a more significant claim.  However, this does personally tell me that my own individual chest pain is nothing to scoff at as it might truly relate to a more underlying issue. If I were to start this project over again I would like to find a bigger dataset than only 300 patients.
+The most time consuming part of this project was not necessarily the data itself but mainly learning how to program in R and likewise how to work with R studio. I was very confused about how to manage R sessions and thought there was an environment I had to point to for individual projects, but as it turns out each R session has zero packages and you install them into your own session from the code. My own concept of Python environments posed some problems and made me spend more time than needed. I also spent a few hours trying to get R to work in Jupyter Notebooks because of my familiarity with notebooks, but I kept getting strange errors that were crashing any R notebook I would try to spin up. To continue with, R markdown for notebooks took a few tries to properly run due to Knit complaining about cran repositories and lines of code needing to be encapsulated in uniquely defined markdown titles. However, the overall hardest part was simply learning and getting used to the general feel of the syntax. I had a difficult time getting used to the concept of piping and plotting differently as well as learning how to properly use the R markdown of Knit. I felt slowed down and hindered since I knew the same code in Python and constantly found myself typing code for Python by accident and wanting to call seaborn graphs. I hope to have more projects in the future in R to get more well versed in the syntax so it does not feel so foriegn to me and in turn I will add more to my own data scientist arsenal.
+
+
+## Conclusion
+The purpose of this project was to find what features and likewise the values of those features seem to impact the determination of classifying heart disease the most. Looking at my statistical testing we do find that cholesterol actually is significant enough to consider it for further analysis and modeling which lines up with my general understanding of heart disease/problems. However, I was conflicted in removing the feature of resting blood pressure due to the fact my statistical test made it seem impactful. But when looking at the visualizations it did not appear that it would hold a significant impact. If given more time I would love to go back and experiment more with this feature. The model is telling us that the features of chest pain, the number of major vessels, and the maximum heart rate achieved impacts the decision the most when determining whether or not the patient has a heart disease. This makes sense as the number of major vessels changes the strain on the heart that could result in a disease as well as the maximum heart rate of the patient.  With an 80% accuracy, there is still rom to grow. Moving forward, I feel as though more patient data would increase the complexity curve of the model making the given accuracy of 80% more impressive. 
+The findings from this study are crucial for the medical experts who work with cardiac patients. The information allows doctors to use certain factors to determine a patient’s future with heart disease. The more clear understanding we have of warning signs, the likelihood of survival increase.  Preventative measures can take place before the patient is in crisis. This study is worth exploring further to allow cardiac patients to have a better quality of life. 
+
+
+

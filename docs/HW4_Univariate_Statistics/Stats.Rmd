@@ -40,6 +40,9 @@ install.packages("ggplot2",repos = "http://cran.us.r-project.org")
 install.packages("plyr",repos = "http://cran.us.r-project.org")
 install.packages("caTools",repos = "http://cran.us.r-project.org")
 install.packages("RColorBrewer",repos = "http://cran.us.r-project.org")
+install.packages("naniar",repos = "http://cran.us.r-project.org")
+install.packages("rpart",repos = "http://cran.us.r-project.org")
+install.packages("rpart.plot",repos = "http://cran.us.r-project.org")
 ```
 
 ```{r path_libs_to_env}
@@ -51,6 +54,9 @@ library(corrplot)
 library(ggcorrplot)
 library(ggplot2)
 library(RColorBrewer)
+library(naniar)
+library(rpart)
+library(rpart.plot)
 ```
 
 ## Import csv file of dataset
@@ -71,11 +77,50 @@ str(heart_df)
 summary(heart_df)
 ```
 
+```{r missing_data_graph}
+vis_miss(heart_df)
+```
+
+There is no missing data for this dataset so no cleaning will be needed. (Thank the data gods!)
+
+## Stat testing age between those with or without heart disease
+```{r t_test_age_target}
+t.test(heart_df$age ~ heart_df$target, mu = 0, alt = "two.sided", conf = 0.95, var.eq = FALSE, paired = FALSE)
+```
+
+The null hypothesis is: there is no difference in average age between those with or without heart disease.
+
+The p-value is near zero, thus we can reject our null hypothesis and with 95% confidence say there is a statistically significant difference between the average age of those who have heart disease vs those who do not.
+
+The confidence interval also does not include zero, therefore, it supports our rejection of the null.
+
+## Stat testing cholesterol between those with or without heart disease
+```{r t_test_cholesterol_target}
+t.test(heart_df$chol ~ heart_df$target, mu = 0, alt = "two.sided", conf = 0.95, var.eq = FALSE, paired = FALSE)
+```
+
+Our null hypothesis states: There is no difference between the average cholesterol levels of a patient with heart disease and of a patient without heart disease.
+
+Our p-value shows that the probability of getting our results/extremes, assuming the null hypothesis is true, will happen 13.6% of the time. Therefore, we cannot reject our null hypothesis.
+
+Also since the 95% confidence interval includes zero, it supports our failure to reject the null hypothesis.
+
+## Stat testing  blood pressure between those with or without heart disease
+```{r t_test_blood_pressure_target}
+t.test(heart_df$trestbps ~ heart_df$target, mu = 0, alt = "two.sided", conf = 0.95, var.eq = FALSE, paired = FALSE)
+```
+
+The null hypothesis is: there is no difference in average blood pressure between those with or without heart disease.
+
+The p-value is 1.3% which is less than 5%, therefore we can reject our null hypothesis and with 95% confidence say there is a statistically significant difference between the average blood pressure of those who have heart disease vs those who do not.
+
+The confidence interval also does not include zero, therefore, it supports our rejection of the null.s
+
 ## Displaying the coralation matrix
 ```{r corr_df}
 corr <- cor(heart_df)
 ```
-#s# Visualize the correlation matrix
+## Visualize the correlation matrix
 ```{r corr_df_plot}
 corrplot(corr)
 ```
@@ -87,21 +132,8 @@ It is a good rule of thumb to always look at the correlation of each of your fea
 heart_df = subset(heart_df, select = c(-fbs,-chol,-restecg))
 ```
 
-## Bar plot for target (Heart disease) 
-```{r bar_plot_target}
-target <- as.factor(heart_df$target)
-ggplot(heart_df, aes(x=heart_df$target, fill=heart_df$target)) + 
-  geom_bar() +
-  xlab("Heart Disease") +
-  ylab("Count") +
-  ggtitle("Presence and Absence of Heart Disease") +
-  scale_fill_discrete(name = "Heart Disease", labels = c("Absence", "Presence"),)
-```
-![alt text here](Plots/Heart Disease Target Analysis.png)  
-
-
 ## Analysis of gender
-```{r plot_gender}
+```{r gender_analysis}
 ggplot(heart_df, aes(x= heart_df$sex, fill=heart_df$target)) + 
   geom_bar() +
   xlab("Gender") +
@@ -113,59 +145,23 @@ ggplot(heart_df, aes(x= heart_df$sex, fill=heart_df$target)) +
 When thinking about gender I would expect more males to have greater heart disease due to the fact they are generally physically bigger individuals and therefore their heart strain must be greater and thus increasing the chances of disease. But upon looking at the data for gender when compared against heart disease, we see that our dataset has more females then males, nearly a 1 to 2 ratio, making our data imbalanced for this feature and as a result we can not use this is untrustworthy for decision making when related to heart disease. 
 
 
-![alt text here](Plots/Heart Disease by gender.png)  
-
 ## Remove gender
-```{r remove_gender_feature}
+```{r remove_gender}
 heart_df = subset(heart_df, select = c(-sex))
 ```
 
-## Bar plot for the chest pain experienced 
-```{r plot_chest_pain}
-ggplot(heart_df, aes(x= cp, fill=cp)) + 
-  geom_bar() +
-  xlab("Chest Pain Type") +
-  ylab("Count") +
-  ggtitle("Analysis of Chest Pain Experienced") +
-  scale_fill_discrete(name = "Chest Pain Type", labels = c("Typical angina pain", "Atypical angina pain", "Non-Anginal pain", "Asymptomatic pain"))
-```
-
-## Density plot for oldpeak ~ target
-```{r plot_oldpeak_by_target}
-ggplot(heart_df, aes(x = oldpeak, fill = target)) +
-  geom_density(alpha=0.5) +
-  xlab("ST depression induced") +
-  ylab("Count") +
-  ggtitle("Analysis of ST depression induced and presence of heart disease") +
-  scale_fill_discrete(name = "Heart disease", labels = c("No", "Yes"))
-```
-
-From the above graph, we can see that as the value of the old peak increases the chances of heart disease decreases. Thus highlighting the importance of this given feature when creating a statistical model or running any basic statistical data. I am surprised to see how this feature seems to impact the target feature heart disease.
-
-![alt text here](Plots/Analysis of ST depression induced and presence of heart disease.png)  
-
 ## Density graph for trestbps (resting blood pressure)
-```{r trestbps_density_graph}
+```{r plot_trestbps}
 ggplot(heart_df, aes(x = trestbps, fill = target)) +
   geom_density(alpha=0.5) +
   scale_fill_discrete(name = "Heart disease", labels = c("No", "Yes"))
 ```
+![alt text here](Plots/trestbps by target.png)  
+
 There is very little difference between the comparison of the feature trestbps and our target heart disease. So, we can remove this feature before model implementation.
 
 ```{r remove_trestbps}
 heart_df = subset(heart_df, select = c(-trestbps))
-```
-
-![alt text here](Plots/trestbps by target.png)  
-
-## Plot for slope ~ target
-```{r st_seg_plot}
-ggplot(heart_df, aes(x= slope, fill=target)) + 
-  geom_bar(position = 'dodge') +
-  xlab("slope of the peak exercise ST segment") +
-  ylab("count") +
-  ggtitle("Analysis of slope of the peak exercise ST segment with presence or absense of heart disease") +
-  scale_fill_discrete(name = "Heart disease", labels = c("No", "Yes"))
 ```
 
 ## Group the different ages in three groups (young, middle, old)
@@ -188,17 +184,38 @@ ggplot(groups, aes(x=groups$age_group, y=groups$group_count, fill=groups$age_gro
 ```
 I converted feature age of continuous data into categorical data of young, middle-aged, and elderly. Doing so also gave it a more clean look and simplified look of the given age data. There seems to be more elderly patients than both middle aged and young grouping. This gives us a general look at what kind of patients we are looking at in terms of age.
 
-# Adding the age groups to the dataset
+## Adding the age groups to the dataset
 ```{r add_new_feature_of_categorical_age}
 heart_df <- cbind(heart_df, age_groups = ifelse((heart_df$age<45), 0, ifelse((heart_df$age>=45)&(heart_df$age<55), 1, 2)))
 heart_df$age_groups <- as.factor(heart_df$age_groups)
 ```
-
+## Remove age feature of continous replace with new age_group
 ```{r remove_old_age}
 heart_df
 heart_df = subset(heart_df, select = c(-age))
 heart_df
 ```
 
+## Create train/test split
+```{r create_train_test_split}
+set.seed(2031)
+require(caTools)
+split = sample.split(heart_df$target, SplitRatio = 0.75)
+train = subset(heart_df, split==TRUE)
+test = subset(heart_df, split==FALSE)
+```
 
-  
+## Create and train a simple decision tree
+```{r display_tree}
+tree = rpart(target~., data=train, method='class')
+prp(tree)
+```
+
+## Get results of tree on testing data
+```{r tree_test_results}
+predictTree = predict(tree, newdata=test, type='class')
+table(test$target, predictTree)
+(22 + 38)/nrow(test)
+```
+
+The model is telling us that the features that chest pain,the number of major vessels, and the maximum heart rate achieved impacts the decision the most when making a decision on whether or not the patient has a heart disease. But sadly we only got a 80% on this model for our testing data, this isn’t terrible but it doesn’t truly capture the full understanding that we would like to see to make a more significant claim. However, this does personally tell me that my own individual chest pain is nothing to scoff as it might truly relate to a more underlying issue.
